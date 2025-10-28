@@ -1,0 +1,55 @@
+h1 {
+	text-align: center;
+}
+
+#subTop { margin-top: 100px; }
+
+#subConts {
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 25px;
+	text-align: center;
+}
+
+#subConts p { margin-bottom: 20px; }
+
+#subConts p:nth-child(1) {
+	margin-top: 100px;
+	font-size: 30px;
+}
+
+#subConts p:nth-child(2) {
+	color: #ff0000;
+}
+
+#subConts p:nth-child(3) {
+	/*padding-left: 200px;*/
+	
+}
+
+#subConts p:nth-child(4) {
+	/*padding-left: 210px;*/
+	
+}
+
+#subConts p:nth-child(5) {
+	padding-top: 15px;
+	color: #0005ff;
+}
+
+#subConts p:nth-child(5) a {
+	color: #0005ff;
+}
+
+#subConts p:nth-child(6) {
+	padding-top: 50px;
+}
+
+#subConts p:nth-child(6) a {
+	padding: 10px 40px;
+	background-color: #808080;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	color: #fff;
+}

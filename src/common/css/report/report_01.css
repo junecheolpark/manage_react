@@ -1,0 +1,23 @@
+﻿.schBox>section {display: table;margin: 0 auto;}
+.schBox i {font-size: 30px;	color: #002157;	vertical-align: middle;}
+.schBox select {width: 100px;}
+#ddlWeekSelect {width: 300px;}
+.tableBtn i {	font-size: 28px; color: #159fc2;}
+#weekInput	 select {	border: none;}
+#weekInput textarea {height: 200px; resize:none;}
+ 
+/** table title **/
+.tableTitle, div.tableTitle { display: table; padding: 0 10px; margin-bottom: 10px; width: 100%; text-align: left; font-weight: bold; }
+/*.tableTitle span, div.tableTitle span { }*/
+.tableTitle img:first-child, div.tableTitle img:first-child { padding-right: 10px; width:40px;}
+.tableTitle .red, div.tableTitle .red { color: #e23321; }
+div.tableTitle > p { display: table-cell; width: 50%; }
+
+div.tableTitle > img { vertical-align: middle; }
+
+.tableBtn { display: block; float: right; }
+#btnWeekNext, #btnWeekPre{display: inline-block; width:30px; height: 30px;}
+#btnWeekNext > img, #btnWeekPre > img{width:100%; vertical-align: middle !important;}
+
+.txtWeek {width: 100%; height: 270px; border: 1px solid #d1d1d1; padding:15px; overflow: auto;}
+td.noData {background:#f4f4f4;}

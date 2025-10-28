@@ -1,0 +1,15 @@
+﻿/* td > span{font-size: 12px;} */
+#AppList tr > th{padding: 5px 4px;}
+#AppList tr > td{padding: 5px 4px;}
+/*상황*/
+.statusBox > .status{padding:4px 14px; }
+.tip1{background-color: #F9D8D4 !important;}
+.tip2{background-color: #F9EDCF !important;}
+.tip3{background-color: #E6F1F9 !important;}
+
+/*.absence : 결근 / .lateness : 지각 */
+.lateness{color:#FF5B5B}
+
+.nomalCnt {text-align: center;}
+
+input[type=checkbox] {width: 18px; height: 18px; border: 1px solid #e4e4e4; accent-color: #FFC12E;}

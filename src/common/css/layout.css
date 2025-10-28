@@ -1,0 +1,153 @@
+﻿body { -webkit-text-size-adjust: 100%; }
+.page { left: 0; right: 0; top: 0; bottom: 0; }
+.row, .col, .page { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; }
+.scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.scroll-y { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.fill, .pane { position: absolute; left: 0; top: 0; right: 0; bottom: 0; width: 100%; height: 100% }
+.pane { display: none; }
+
+/* Workaround: in landscape mode, IEMobile makes bottom toolbar overlap the page, so shorten the page by 70px to compensate */
+.iemobile .page { bottom: -6px; }
+@media screen and (orientation:landscape) { .iemobile .page { bottom: 70px; } }
+
+.header { background-color: #f5f5f5; font-size: 14px; }
+/*.footer { }*/
+.right.col { border-left: 1px solid #e9e9e9; }
+/*.right.col .body { }*/
+            
+.tiles { overflow-y: hidden; }
+
+/* Pane configuration */
+.left.col { width: 200px; background-color: #fff; }
+.right.col { left: 200px; right: 0; background-color: #f0f1f4; }
+.header.row { height: 70px; background-color: #ffd800; }
+
+.body.row { top: 50px; bottom: 0; }
+.footer.row { /*bottom: 0;*/ color: #ccc; text-align: center; margin-bottom: 20px; }
+
+#subHead, #subFoot { min-width: 1720px; }
+
+#subHead { position: fixed; top: 0; left: 200px; right: 0; height: 70px; z-index: 1; background-image: linear-gradient(to right, #79c473, #15a1c4); }
+
+#subHeadBody { display: table; width: 100%; height: 70px; }
+#subHeadBody > section { display: table-cell; width: 50%; vertical-align: middle; }
+
+#menuToggle i { color: #fff; font-size: 30px; margin-left: 30px; }
+.shadowBox { background-color: #fff; border: 1px solid #ddd; border-radius: 5px; box-shadow: 1px 1px 5px 1px #dfdfdf; }
+
+/*#subLeft { }*/
+/*#subLeft > nav { float: left; }*/
+
+#subLeft header { padding-top: 15px; text-align: center; }
+
+#subLeftMenu { padding: 40px 0 0 40px; }
+
+#subMenuDepth li { margin-top: 15px; }
+
+.subMenuDepth1 { padding-bottom: 10px; }
+.subMenuDepth1 a { font-size: 14px; font-weight: bold; color: #444; }
+.subMenuDepth1 a img { margin-top: -7px; margin-right: 5px; width: 30px; height: 30px; }
+.subMenuDepth2 { margin-left: 35px; }
+.subMenuDepth3 a { font-size: 11px; color: #aaa; }
+
+#subRight { min-width: 1720px; margin-top: 70px; }
+#subRight .header.row { height: 50px; }
+
+#subContsBox { display: table; width: 100%; padding: 15px 15px 20px 15px; }
+
+#loginInfo ul { float: right; margin-right: 30px; }
+#loginInfo ul li { display: inline; color: #fff; line-height: 55px; }
+#loginInfo ul li:last-child { margin-right: 0; }
+#loginInfo ul li a { color: #fff; }
+#loginInfo img { vertical-align: middle; }
+
+.icLine { margin: 0 20px; }
+
+#viewClick { display: none; border: 1px solid #fff; padding: 5px 20px; position: absolute; top: 42px; right: 30px; }
+#viewClick p { color: #fff; }
+#viewClick p a { color: #fff; }
+
+/*footer*/
+footer {position: absolute; bottom: 50px; width: 100%; height: 50px; text-align: center; color: #ccc; font-weight: normal; clear: both; }
+
+/* 페이지 상단 감추기 */
+#subRight .header.row { display: none; }
+.body.row { top: 0; }
+
+#subHead.subClose, #subRight.subClose { left: 0; }
+#subLeft.menuClose { display: none; }
+
+/* 상단 CSS */
+.topMenu{position: fixed; top:0; left:0; width:100%; display: flex; justify-content: space-between; align-items: center; background-color: #333; padding:10px 40px; z-index: 999; min-width: 965px;}
+.topMenu > div.menuList > ul{display: flex; justify-content: space-evenly; width:600px;}
+.topMenu > div.menuList > ul > li > a{color:#fff; font-size: 16px; line-height: 24px;}
+.topMenu > div.menuList > ul > li > a:hover{color:#0091ea;}
+.topMenu > div.menuList > ul > li > a.choiceMenu{color:#0091ea; position: relative;}
+.topMenu > div.menuList > ul > li > a.choiceMenu::after{content: ''; display: block; position: absolute; bottom:-16px; left:50%; transform: translate(-50%); width:100%; height: 4px;background-color: #FFC12E; position: relative;}
+.topMenu > div.menuList > ul > li > a > img{width: 24px;}
+.topMenu > div.userInfo{display: flex; align-items: center;}
+.topMenu > div.userInfo > a{width:24px; height: 24px; margin-right:20px;}
+.topMenu > div.userInfo > div.user{margin-left:20px; position: relative;}
+.topMenu > div.userInfo > div.user::before{content: ''; width:1px; height: 100%; background-color: #707070; position: absolute; top:0; left: -20px;}
+.topMenu > div.userInfo > div.user > a{display: flex; align-items: center;}
+.topMenu > div.userInfo > div.user > a > img{width:24px; height: 24px; background-color: #eee;/*기본 배경색 */ border-radius: 4px; margin-right: 10px;}
+.topMenu > div.userInfo > div.user > a > span{color:#fff;}
+.topMenu > div.userInfo > div.user > a > span > span{color:#ccc;}
+.topMenu > div.logo a{display: inline-block; width:130px;}
+.topMenu > div.logo a > img{width:100%;}
+
+#menuAll{display: none; position: absolute; z-index: 999; top:60px; left:0; width:100%; background-color: #fff; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);}
+#menuAll > ul{display: flex; justify-content: center; padding:30px;}
+#menuAll > ul > li{flex-basis: 130px; text-align: center; margin-right: 10px;}
+#menuAll > ul > li:last-child{margin-right: 0;}
+#menuAll > ul > li > a{display: block; font-size: 16px; font-weight: 600; border-bottom: 1px solid #ccc; padding:10px; margin-bottom: 10px;;}
+#menuAll > ul > li > ul > li > a{display: block; padding: 10px;}
+#menuAll > ul > li > ul > li > a:hover{color:#0091ea;}
+
+/** 로딩중 **/
+.loading-layer { display: none; position: absolute; top: 50%; left: 50%; width: 100%;  height: 100%; z-index: 9999; transform: translate(-50%, -50%);}
+.loading-layer .loadingBg { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; height: 100%; background: #fff; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* IE 5-7 */ filter: alpha(opacity=50); /* Netscape */ -moz-opacity: 5.0; /* Safari 1.x */ -khtml-opacity: 0.5; /* Good browsers */ opacity: 0.5; }
+.loading-layer .loadingImg { position: absolute; top: 50%;  left: 50%; margin: -50px 0 0 -50px; }
+.loading-layer .loadingImg img {animation: rotate_image 3s ease-out infinite;transform-origin: 50% 50%;}
+
+@keyframes rotate_image{
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/** Auto Size Layer Popup **/
+.dim-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; }
+.dim-layer .dimBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #999; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* IE 5-7 */ filter: alpha(opacity=50); /* Netscape */ -moz-opacity: 5.0; /* Safari 1.x */ -khtml-opacity: 0.5; /* Good browsers */ opacity: 0.5; }
+
+/** 자동완성 검색 **/
+.ui-autocomplete-loading { background: url(/resources/images/ajax-loader-s.gif) no-repeat center; }
+.ui-autocomplete { max-height: 200px; overflow-y: auto; overflow-x: hidden; }
+.ui-menu-item { padding: 3px 6px; }
+.ui-menu-item strong { color: #006fc1; }
+.ui-menu-item .resultMenu { font-size: 14px; font-weight: 800; }
+
+#popUserInfo{display: none; position: absolute; top:70px; right:30px; width:300px; background-color: #fff; z-index: 999; border-radius: 12px; overflow: hidden; }
+#popUserInfo .btn-layerClose{position: absolute; top: 25px; right: 20px; z-index: 1;}
+/*캐릭터 배경 기본색 #eee 기본 이미지 no_Image.jpg*/
+#popUserInfo > .popInfoTop{height: 200px; background-color: #eee; padding:20px; position: relative;}
+#popUserInfo > .popInfoTop > #managerBadge{padding:4px 8px; background-color: #FFC12E; color: #fff; border-radius: 100px; position: absolute; top:20px; left:20px;}
+#popUserInfo > .popInfoTop > #userCharacter{position: absolute; bottom: 0; left:50%; transform: translate(-50%); width:180px; height: 180px;}
+#popUserInfo > .popInfoTop > #userName{position: absolute; bottom: 20px; left: 20px;}
+#popUserInfo > .popInfoTop > #userName > span{display: block;}
+
+.popInfoCont{padding:20px;}
+.popInfoCont > #popMyLink > a{display: block; border:1px solid #ccc; border-radius: 4px; width:100%; text-align: center; padding:8px; margin-bottom: 10px; line-height: 28px;}
+.popInfoCont > #popMyLink > a > img{width:24px; height: 24px; margin-right: 5px;}
+
+#popMyInfo > ul{margin-top: 25px;}
+#popMyInfo > ul > li > a{display: block; line-height: 24px;}
+#popMyInfo > ul > li > span{line-height: 24px;}
+#popMyInfo > ul > li img{width:24px; height: 24px; margin-right: 5px; padding:4px}
+
+/*게시판 열리고닫히는 클래스*/
+.noChoice{display: block !important;}
+.noChoice > section{width: 100%;}
+.noChoice > section:last-child{display: none;}

@@ -1,0 +1,7 @@
+﻿#clipboard_01{display: grid; grid-template-columns: 1.2fr 1fr; margin-top: 15px;}
+#clipboard_01 > section{padding:15px; min-height: 680px;}
+#clipboard_01 > section:first-child{margin-right: 10px;}
+.ck.ck-editor {width: 100%;}
+.ck-editor__editable {min-height: 100px;}
+
+.boardFootBtn {position: relative; float: right; margin-top: -45px;}

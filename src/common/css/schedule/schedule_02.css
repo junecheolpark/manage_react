@@ -1,0 +1,116 @@
+﻿input[type=checkbox] {width: 18px;height: 18px;border: 1px solid #e4e4e4;accent-color: #FFC12E;}
+/*project_01*****************************/
+.contsTB {cursor:auto;}
+.noProject {cursor:not-allowed;}
+.contsTB .noProject:hover{background-color: #eee;}
+.contsTB .noProject p{margin: 35px auto;}
+.contsTB .noProject img{margin-bottom: 40px;}
+.contsTB { display: block; margin: 15px 0; padding: 15px; background-color: #fff; width: 100%; border-radius: 12px; border:1px solid #ccc;}
+
+.tableTB > tbody > tr:hover > th, .tableTB > tbody > tr:hover > td { background-color: #eee; cursor: pointer;}
+.tableTB > tbody > tr.selRow td, .tableList > tbody > tr.selRow:nth-child(2n+2) td { background-color: #eee; }
+
+.tableTB > tbody > tr > td:nth-child(1) > a  {display: inherit;}
+
+.progressBox > .progress{height: 5px; position: relative; background-color: #f1f4f7; border: 1px solid #e7e8e9; border-radius: 100px; width:90%; display: inline-block;}
+.progressBox > .progress p{height: 5px; background-color: #FFC12E; border-radius: 100px; width: 100%;}
+.progressBox > span{ margin-left: 10px;; font-size: 12px;}
+
+
+.projectCharge > div > img{width:24px; height: 24px; margin-right: 10px; border-radius: 4px;}
+.projectCharge > a{display: inline-block; padding:2px 10px; border:1px solid #ccc; border-radius: 4px;}
+.projectCharge > div > span{display: inline-block; padding:2px 10px; /*border:1px solid #ccc;*/ margin-top:5px; border-radius: 4px; background-color:#eee;}
+.projectCharge > div img{width:24px; height: 24px; margin-right: 10px; border-radius: 4px;}
+.projectCharge > a > img{width:24px; height: 24px; margin-right: 10px; border-radius: 4px;}
+
+/*project_02*****************************/
+
+.contens .noproCont .noProject{position: absolute; top:50%; left:50%; transform: translateY(-50%); cursor: not-allowed;}
+.contens .noproCont .noProject > p{margin: 25px auto;}
+.contens .noproCont .noProject > p > img{margin-bottom: 40px;}
+
+.colText{width: 100%; resize: none; background-color:transparent; border: none;}
+
+#plusProject{position: fixed; bottom: 40px; right: 40px;}
+#plusProject > a{display: block; width:80px; height: 80px; border-radius: 100px; border:1px solid #FFC12E; background-color: #fff; text-align: center; padding-top: 28px;}
+#plusProject > a > img{width:24px; height: 24px;}
+#projectSchBox{font-weight: 500; overflow: hidden; padding:5px 0;}
+#projectSchBox > li{display: block; margin-right: 50px; position: relative; float: left;}
+#projectSchBox > li::after{position: absolute; display: block; content: ''; width:1px; height: 24px; background-color: #ccc; right:-30px; top:-4px;}
+#projectSchBox > li:last-child:after{display: none;}
+#projectSchBox > li > span:first-child{margin-right: 10px; color:#999; font-weight: 400;}
+#projectSchBox > li:nth-child(1) > span:nth-child(2){font-weight: 900; }
+#projectSchBox > li:nth-child(2) > span:nth-child(2){padding: 4px 12px; background-color: #FFC12E; border-radius: 20px; color:#fff;}
+#projectSchBox > li:nth-child(3) > span:nth-child(2){font-weight: 900; }
+#projectSchBox > li:nth-child(4) > span:nth-child(2){padding: 4px 12px; background-color: #60D07E; border-radius: 20px; color:#fff; margin-right: 10px;}
+#projectSchBox > li:nth-child(5){margin-top: -5px;}
+#projectSchBox > li:nth-child(5) > a{display: block; background-color: #fff; padding: 4px 10px; float: left; border:1px solid #ccc;}
+#projectSchBox > li:nth-child(5) > a:first-child{border-top-left-radius: 4px; border-bottom-left-radius: 4px; border-right: 0;}
+#projectSchBox > li:nth-child(5) > a:last-child{border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-left: 0;}
+#projectSchBox > li:nth-child(5) > a.onMeno{ background-color:#FFC12E; color:#fff;}
+
+/*서브 프로젝트 컬러 순서대로 변경됨*/
+.jscType1{background-color: #FEFBE8; border: 1px solid #FFC12E;}
+.jscType1 .proTitle > p:first-child > span{color:#FFC12E;}
+.jscType1 > .proCon li  .projectDday{color:#FFC12E; background-color: #FEFBE8;}
+.jscType1 > .proCon li.prsPlusBtn{background-color: #FEFBE8; border:1px dashed #FFC12E;}
+.jscType1 > .proCon .inputBtn{background-color: #FFC12E; border:1px solid #FFC12E; color: #fff;}
+.jscType1 > .proCon .pcTitle label{display:block;position:absolute;top:0;left:0;width:24px;height:24px;background:url(/resources/images/login/checkBox.png) 0 0 no-repeat;background-position:-29px 0;background-size: 1;cursor:pointer;}
+.jscType1 > .proCon li.prsPlusBtn > a{color:#FFC12E}
+.jscType1 > .proCon .projectPg {padding: 2px 10px; background-color: #FFC12E; border-radius: 20px; color:#fff;  margin-left: auto;}
+.jscType2{background-color: #EFF6FF; border: 1px solid #57A0FF;}
+.jscType2 .proTitle > p:first-child > span{color:#57A0FF;}
+.jscType2 > .proCon li .projectDday{color:#57A0FF; background-color: #EFF6FF;}
+.jscType2 > .proCon li.prsPlusBtn{background-color: #EFF6FF; border:1px dashed #57A0FF;}
+.jscType2 > .proCon .inputBtn{ background-color: #0091ea; border-color: #0091ea; color:#fff}
+.jscType2 > .proCon li.prsPlusBtn > a{color:#57A0FF}
+.jscType2 > .proCon .projectPg {padding: 2px 10px; background-color: #57A0FF; border-radius: 20px; color:#fff;  margin-left: auto;}
+.jscType3{background-color: #F0FBF3; border: 1px solid #60D07E;}
+.jscType3 .proTitle > p:first-child > span{color:#60D07E;}
+.jscType3 > .proCon li .projectDday{color:#60D07E; background-color: #F0FBF3;}
+.jscType3 > .proCon li.prsPlusBtn{background-color: #F0FBF3; border:1px dashed #60D07E;}
+.jscType3 > .proCon .inputBtn{background-color: #4caf50; border-color: #4caf50; color:#fff;}
+.jscType3 > .proCon li.prsPlusBtn > a{color:#60D07E}
+.jscType3 > .proCon .projectPg {padding: 2px 10px; background-color: #60D07E; border-radius: 20px; color:#fff;  margin-left: auto;}
+.jscType4{background-color: #FDEFEC; border: 1px solid #FF5C48;}
+.jscType4 .proTitle > p:first-child > span{color:#FF5C48;}
+.jscType4 > .proCon li .projectDday{color:#FF5C48; background-color: #FDEFEC;}
+.jscType4 > .proCon li.prsPlusBtn{background-color: #FDEFEC; border:1px dashed #FF5C48;}
+.jscType4 > .proCon .inputBtn{background-color: #FF5B5B; border:1px solid #FF5B5B; color:#fff;}
+.jscType4 > .proCon li.prsPlusBtn > a{color:#FF5C48}
+.jscType4 > .proCon .projectPg {padding: 2px 10px; background-color: #FF5C48; border-radius: 20px; color:#fff;  margin-left: auto;}
+
+.pcTitle img{width:12px; filter:opacity(0.3); padding-top: 3px; margin-right:10px; }
+.projectSubCont > .proCon .ellipsis{display:flex;}
+.projectSubCont > .proCon .ellipsis > .ellipsis2 {display: table-cell;overflow: hidden;text-overflow: ellipsis;}
+.nonColor {background-color: #fff0 !important;}
+
+#projectCont{overflow-x: scroll; width: 100%; margin-top: 15px; padding-bottom: 20px;}
+#projectCont > ul{ white-space: nowrap;}
+.projectSubCont{width:350px;  padding:20px; border-radius: 12px; margin-right: 20px; display: inline-block; vertical-align: top;}
+.projectSubCont > .proTitle{margin-bottom: 15px;}
+/*.projectSubCont > .proCon{Max-height: 608px;  overflow-y: scroll; }*/
+.selUserList:hover + .touchUserList{display : block;}
+.touchUserList {display:none; background-color: #fff; padding: 10px; border-radius: 8px; border:1px solid #ccc;}
+.projectSubCont > .proCon li{background-color: #fff; padding: 10px; border-radius: 8px; border:1px solid #ccc; margin-bottom: 10px;}
+.projectSubCont > .proCon .completion{background-color: #ffffff24;}
+.projectSubCont > .proCon li:last-child{margin-bottom: 0;}
+.projectSubCont > .proCon li div{margin-bottom: 10px;}
+.projectSubCont > .proCon li div:last-child{margin-bottom: 0;}
+.projectSubCont > .proCon li .projectDday{padding:2px 8px; border-radius: 4px;}
+.projectSubCont > .proCon li .pcMemo{overflow: hidden;}
+.projectSubCont > .proCon li .pcMemo > img{float:left; }
+.projectSubCont > .proCon li .pcMemo > span{float:left; }
+.projectSubCont > .proCon li .pcMemo > span > a{display:block; padding:5px 0px;}
+.projectSubCont > .proCon li .pcMemo > p{float:left; padding-left: 10px; width:255px; white-space: initial;}
+.projectSubCont > .proCon li.prsPlusBtn{text-align: center; height: 90px; line-height: 70px; ;}
+.projectSubCont > .proCon li.prsPlusBtn > a{display: block; font-size: 40px; width:100%;}
+
+.clickView{position: relative;}
+.clickView > .clickvCont{ display: none;position: absolute; bottom:-115px; right:-180px; width: 200px; background-color: #fff; border:1px solid #ccc; border-radius: 4px; overflow: hidden;}
+.clickView > .clickvCont > li:hover > a{background-color: #f9f9f9;}
+.clickView > .clickvCont > li > a{display: block; padding: 10px;;}
+
+.linkQuick{display: flex; gap:10px; justify-content: end}
+.linkQuick > li{padding:2px 5px; background-color: #fff; border:1px solid #ccc;}
+.linkQuick > li:hover{border:1px solid #FFC12E;}

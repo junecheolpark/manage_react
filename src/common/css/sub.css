@@ -1,0 +1,168 @@
+﻿.schBox { padding: 5px 15px; font-weight: 700; }
+
+/* table style */
+.tableBody { display: table; width: 100%; }
+
+/*.TableTransparency { }*/
+.TableTransparency th { padding: 0; font-size: 12px; line-height: normal; }
+.TableTransparency td { padding: 0; text-align: left; }
+
+.tableView {border-top:2px solid #333;}
+
+.tableView th { background-color: #fbfbfb; border-bottom: 1px solid #e1e1e1; font-size: 12px; height: 50px; }
+.tableView td { background-color: #fff; border-bottom: 1px solid #e1e1e1; text-align: left; height: 50px; }
+/* 필수항목 */
+.tableView th.esti { /*color: #ff0000;*/ background-image: url(/resources/images/bullet/bl_red.png); background-repeat: no-repeat; background-position: 7px center; background-size: 3px 12px; }
+
+/*.tableView input[type=text],
+.tableView input[type=password],
+.tableView textarea,
+.tableView select { width: 100%; }*/
+
+.tableList {border-top:2px solid #333;}
+.tableList caption { text-align: left; padding: 0 0 10px 10px; }
+.tableList > thead > tr > th, .tableList > tbody > tr > th { background-color: #fbfbfb; border-bottom: 1px solid #e1e1e1; font-size: 12px; }
+/*.tableList tr th:first-child { border-left: none; }
+.tableList tr th:last-child { border-right: none; }*/
+.tableList > thead > tr > td, .tableList > tbody > tr > td { background-color: #fff; border-bottom: 1px solid #e1e1e1; }
+.tableList > tbody > tr > td { cursor: pointer; }
+.tableList > tbody > tr:hover > th, .tableList > tbody > tr:hover > td { background-color: #eee; }
+/*.tableList tr td:first-child { border-left: none; }
+.tableList tr td:last-child { border-right: none; }*/
+.tableList tr:last-child td { border-bottom: 1px solid #e1e1e1; }
+.tableList tr:nth-child(2n+2) td { background-color: #f4fbff; }
+.tableList > tbody > tr.selRow td, .tableList > tbody > tr.selRow:nth-child(2n+2) td { background-color: #eee; }
+/*.tableList td > a:hover { }*/
+/*.tableList tbody > tr:hover td { }*/
+/*.tableList > tfoot > tr > td { border-right: 1px solid #e1e1e1; }*/
+.tableList > tfoot > tr:nth-child(1) > td { background-color: #fbfbfb; }
+/*.tableList > tfoot > tr:nth-child(2) > td { background-color: #fbfbfb; }*/
+
+.tableList > thead > tr > td.noBorder, .tableList > tbody > tr > td.noBorder, td.noBorder { border: none; }
+.tableList > tbody > tr > td.bottomBorder { border-bottom: 1px solid #e1e1e1; }
+
+.tableList.multi { margin-top: 10px; }
+.tableList.multi > tbody > tr:first-child > td { border-bottom: 1px solid #e1e1e1; }
+
+.tableSort { cursor: pointer; /*padding-left: 5px;*/ }
+.tableSort em { font-style: normal; font-weight: 800; }
+.tableSort img { vertical-align: middle; }
+
+.tableList.noCursor > tbody > tr > td { cursor: auto; }
+th.thL, td.tdL { text-align: left; }
+th.thC, td.tdC { text-align: center; }
+th.thR, td.tdR { text-align: right; }
+th.thVTop, td.tdVTop { vertical-align: top; }
+td.none { padding: 200px 0; text-align: center; }
+th.rLine, td.rLine { border-right: 1px solid #e1e1e1; }
+/******************************/
+
+/* Paging Style */
+/*.tableFooter { }*/
+.tableFooter .btn { position: relative; float: right; margin-top: -29px; }
+.paging { padding-top: 20px; text-align: center; }
+.paging button { background: none; border: none; min-width: 28px; height: 29px; padding: 0 7px; text-align: center; cursor: pointer; }
+.paging button.img { border: 1px solid #d6d9dd; text-align: center; background-color: #fff;}        
+.paging button.img.brNo { border-right: none; }
+.paging button.img img, .paging button.img.brNo img { padding-top: 3px; }
+/*.paging a:active { }*/
+.paging button:hover { background-color: #c7c7c7; color: #444; }
+.paging .on { color: #0091ea;}
+.paging .no { cursor: not-allowed; }
+/*.paging .end, .paging .on.end { }*/
+
+/*.paging a.on:link { color: #666; background: #f5f5f5; }
+.paging a.on:visited { color: #666; background: #f5f5f5; }*/
+/******************************/
+/** table title **/
+.contsTitle, div.contsTitle { padding: 0 10px; margin-bottom: 10px; width: 100%; text-align: left; font-weight: bold; }
+.contsTitle img:first-child, div.contsTitle img:first-child { padding-right: 15px; }
+.contsTitle .red, div.contsTitle .red { color: #e23321; }
+div.contsTitle > p { display: table-cell; width: 50%; }
+
+div.contsTitle > img { vertical-align: middle; }
+
+.tableBtn { display: block; float: right; }
+
+/* div scroll */
+.DivScrollYHead { padding-right: 17px; background-color: #fbfbfb; border-top: 2px solid #333; }
+.DivScrollYHead .tableList { border: none; }
+/* .DivScrollYHead .tableList > thead > tr > th { border: none; } */
+/* .DivScrollYHead .tableList > thead > tr > td { border: none; border-bottom: 1px solid #e1e1e1; }
+.DivScrollYHead .tableList > thead > tr > th:last-child { border-right: 1px solid #fafafa; } */
+/*.DivScrollYHead .tableList > tbody > tr > td:last-child {  }*/
+.DivScrollY { overflow-y: scroll; overflow-x: hidden; min-height: 200px; background: #fff; border: 1px solid #e1e1e1; border-top: none; }
+.DivScrollY .tableList { border: none; }
+.DivScrollY .tableList > tbody > tr td:first-child { border-left: none; }
+.DivScrollY.AllBorder { border: 1px solid #e1e1e1; }
+.DivScrollY.AllBorder .tableView { border: 1px solid #e1e1e1; }
+
+/** Auto Size Layer Popup **/
+.dim-layer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; }
+.dim-layer .dimBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #999; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* IE 5-7 */ filter: alpha(opacity=50); /* Netscape */ -moz-opacity: 5.0; /* Safari 1.x */ -khtml-opacity: 0.5; /* Good browsers */ opacity: 0.5; }
+
+.autoSizeLayerBg { position: fixed; width: 100%; height: 100%; overflow-x: hidden; overflow-y: auto; z-index: 30; }
+.autoSizeLayer { display: table; /* 레이어 위치는 페이지(javscript/css)에서 처리 */ /*margin: 0 auto; position: absolute; top: 50%; left: 50%;*/ width: 300px; background: #fff; border: 1px solid #ccc; border-radius: 12px; -moz-border-radius: 12px; -webkit-border-radius: 12px; box-shadow: 1px 1px 10px 3px #ccc; }
+.autoSizeLayerT {
+    padding: 1px; border-bottom: 1px solid #f2f2f2;
+    background-clip: padding-box;
+    background-color: #fff;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    -moz-border-top-left-radius: 14px;
+    -moz-border-top-right-radius: 14px;
+    -webkit-border-top-left-radius: 14px;
+    -webkit-border-top-right-radius: 14px;
+}
+.autoSizeLayerTInner { padding: 15px 20px; }
+.autoSizeLayer h4, .autoSizeLayer h4 span { width: 100%; cursor: move; color: #333; font-size: 17px; }
+.autoSizeLayer h4 img { vertical-align: middle; }
+.autoSizeLayerCls { position: relative; float: right; margin: 15px; }        
+/*.autoSizeLayerCls a { }*/
+/*.autoSizeLayerCls a:hover { }*/
+.autoSizeLayerCont { padding: 20px; }
+/*.autoSizeLayerCont .autoSizeLayerContBody { }*/
+.autoSizeLayerCont .popTitle { padding-bottom: 15px; font-size: 11px; }
+.autoSizeLayerCont .popTitle img { vertical-align: middle; }
+.autoSizeLayerF { text-align:center; padding-top: 15px; }
+
+.contens > .contsL { display: block; float: left; padding: 15px; background-color: #fff;  width: 49.5%; min-height: 700px; }
+.contens > .contsR { display: block; float: right; padding: 15px; background-color: #fff;  width: 49.5%; min-height: 700px; }
+.contsF { display: block; margin: 15px 0; padding: 15px; background-color: #fff; width: 100%; min-height: 680px; border-radius: 12px; border:1px solid #ccc;}
+
+/* 파일 업로드 버튼 */
+.filebox label { display: inline-block; width: auto; cursor: pointer; padding: 7px 15px; border-radius: 5px; font-weight: bold; vertical-align: middle; border: 1px solid #ddd; background-color: #fff; color: #444; }
+
+/* 파일 필드 숨기기 */
+.filebox input[type="file"] { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* 달력 */
+input.cal { background-image: url(/resources/images/icon/ic_schedule_off.png); background-repeat: no-repeat; background-position: center right; padding-right: 30px; }
+
+.contentsBox{ padding-top: 60px; height: 100vh;}
+.leftMenu{position: fixed; width:240px; background-color: #fff; height: 100vh; border-right:1px solid #ccc; z-index:9;}
+.leftBox{display: flex; align-items: center; justify-content: center; position: absolute; right: -30px; top:10px; cursor: pointer;
+    width:30px; height: 30px; background-color: #fff; border: 1px solid #ccc; border-radius: 0 20px 20px 0;  border-left: 0;}
+.leftBox > img{height:16px;}
+.leftMenu > .lmTop{padding:40px 20px 10px 20px; border-bottom: 1px solid #ccc; min-height: 142px;}
+.leftMenu >.lmMenu > h3{margin:20px; font-size: 16px; line-height: 24px;}
+.leftMenu >.lmMenu > h3 > img{display: inline-block; width:24px; height: 24px;}
+.leftMenu >.lmMenu > ul > li > a{padding:10px 30px; display: block; font-size: 16px;}
+.leftMenu >.lmMenu > ul > li > a:hover{background-color: #f2f2f2; border-top-right-radius: 100px; border-bottom-right-radius: 100px; margin-right:40px;}
+.leftMenu >.lmMenu > ul > li.lmChoice{border-left: 5px solid #0091ea; position: relative;}
+.leftMenu >.lmMenu > ul > li.lmChoice::after{content: '>'; display: block; width:24px; height: 24px; top:0; right: 50px; position: absolute; font-size: 26px; color:#0091ea; font-weight: bold;}
+.leftMenu >.lmMenu > ul > li.lmChoice > a{color:#0091ea; padding: 10px 20px;}
+
+#leftTop {overflow: hidden;}
+#leftTop .leftTopConts {display:none;}
+
+#leftTopRpt01 .ucTable > div {width: 50%;}
+#leftTopRpt01 .ucTable > div > p {display: block; width:100%; padding:4px 10px; border:1px solid #ccc; border-radius:4px;}
+#leftTopRpt01 .ucTable > div:first-child {padding-right: 5px;}
+#leftTopRpt01 .ucTable > div:last-child {padding-left: 5px;}
+#leftTopRpt01 > a {margin-top:5px;}
+
+.contens{margin-left:240px; background-color: #f7f7f7; padding: 20px 20px 20px 50px; min-height: -webkit-fill-available; overflow: hidden;}
+.schBox > div, .schBox > p{display: inline-block;}
+.ucTable {display: table; width: 100%;}
+.ucTable > div {display: table-cell;}
