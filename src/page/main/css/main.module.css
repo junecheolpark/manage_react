@@ -1,0 +1,101 @@
+﻿body{background-color:#f7f7f7; height:100%; min-width: 1680px !important}
+
+.fick{color:#999; font-size: 14px; line-height: 32px; padding: 10px 0px 30px 0px;}
+.fick > span{color:#999; font-size: 14px;}
+.fick > img{display: inline-block; width:24px; height: 24px; padding: 2px;}
+
+/* #menuToggle a { display: none; } 
+#contentswrap2 { width: 600px; margin-left: 10px; }
+#contentswrap3 { width: 830px; margin-top: 10px; }
+#contentswrap4 { width: 830px; margin-left: 10px; margin-top: 10px; } 
+
+.icGoplus { float: right; margin-top: -7px; margin-right: 45px; }
+*/
+/*contentswrap1*/
+.indexSchedule { width: 99%; margin: auto; }
+.indexSchedule table td.nowDay { background-color: #e0dfff; }
+.indexSchedule table th { background-color: #fff; border-right: 1px solid #eee; }
+.indexSchedule table td { height: 273px; word-break: keep-all; vertical-align: top; border-right: 1px solid #eee; }
+.indexSchedule table td > p { text-align: left; }
+.indexSchedule table th:nth-last-child(1),
+.indexSchedule table td:nth-last-child(1) { border-right: none; }
+.indexSchedule table th.sun, .indexSchedule table th.holy { color: #ff0000; }
+.indexSchedule table th.sat { color: #0000ff; }
+.indexSchedule table th.sun, .indexSchedule table th.holy, .indexSchedule table td.sun, .indexSchedule table td.holy { background-color: #fef5f5; }
+.indexSchedule table th.sat, .indexSchedule table td.sat { background-color: #f5f6fe; }
+.indexSchedule table tr.weekNM th { padding: 0; }
+
+
+/* 컨텐츠 레이아웃 CSS */
+.board{background-color: #f7f7f7; margin-top: 60px;}
+.mainBoard{display: grid; padding:40px 40px 60px 40px; grid-template-rows: auto; gap: 20px;
+    grid-template-areas: 
+    "tA tA tA bulletin"
+    "weekly weekly weekly weekly"; grid-template-columns: 0fr 1.6fr 0fr 1.6fr;}
+.tA{grid-area: tA;}
+.weekly{grid-area: weekly;}
+.bulletin{grid-area: bulletin;}
+.contBox{background-color: #fff; border-radius: 10px; outline: 1px solid #ccc; padding:20px;}
+
+.myPlace{position: relative; padding: 20px 40px 20px 40px;}
+.myPlace > div{display: grid;  margin-top: 10px; gap: 20px; grid-template-rows: 200px; 
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;}
+.memo{background-color: #fff;}
+.myPlace > div > div{border-radius: 10px; outline: 1px solid #ccc; background-color: #fff; position: relative;}
+.placeTitle{position: absolute; overflow: hidden; width:100%; padding:15px 10px;}
+.placeTitle > textarea{background-color:transparent; height: 139px; resize: none; margin-top: 8px; /* border: none; */}
+.myPlace > P{line-height: 14px;}
+.myPlace > P > a{display: inline-block; padding:5px 16px; border:1px solid #ccc; border-radius: 50px; background-color: #fff; font-weight: 500;}
+.myPlace > P > a > img{width:14px; height: 14px; margin-right: 4px;}
+
+.mTitle{margin-bottom: 15px;}
+.moreBtn{float:right; color:#ccc;}
+.mTitle > select{border-radius:4px; border:1px solid #ccc;}
+
+/* 근태관리 */
+.txtC{margin-top: 19px; padding-top: 20px; border-top: 1px dotted #ccc; }
+.txtC > span{display:inline-block; height: 44px; width: 49%; padding:14px; margin: 10px 0; border:1px solid #ccc; border-radius: 100px;}
+.txtC > div{height: 44px; border:1px solid #FFC12E; padding:14px; border-radius: 100px;}
+.tA > .contBox {height:280px;}
+
+/*주간업무*/
+.weekly > .contBox{padding: 0 !important;  height: 273px;}
+.indexSchedule { margin: auto; }
+.indexSchedule table th { background-color: #fff; border-right: 1px solid #eee;}
+.indexSchedule table td { height: 211px; word-break: keep-all; vertical-align: top; border-right: 1px solid #eee; }
+.indexSchedule table td > p { text-align: left; }
+.indexSchedule table th:nth-last-child(1),
+.indexSchedule table td:nth-last-child(1) { border-right: none; }
+.indexSchedule table th.sat, .indexSchedule table td.sat { background-color: #f5f6fe; }
+.indexSchedule table tr.weekNM th { padding: 0; }
+
+.sc_box {width: 100%;line-height: 18px;padding: 8px; border:1px solid #ccc; border-radius: 8px;}
+/* .sc_box span:first-child { color: #FFC12E; } */
+.sc_box span:nth-child(2) {color: #046fb8;}
+
+/* 게시판 */
+.bulletin > .contBox > .noticeTop {  margin-top: 10px; padding-left: 15px;}
+.bulletin > .contBox {  height: 273px;}
+.bulletin > .contBox > .tabMenuList ul {width:100%; min-width:102px !important;}
+.bulletin > div:nth-child(2) > a > img{width:24px; height: 24px; display: inline-block; margin-right: 10px;}
+.bulletin > div:nth-child(2) > a > span{line-height: 24px;}
+.bulletin > .contBox{padding: 0!important; overflow: hidden;}
+.bulletin > .contBox > .tabMenuList{float:left; width:25%; padding:20px;}
+.bulletin > .contBox > .tabMenuList .menuToggle{display: inline-block;}
+ li.choicebulletin{background-color: #0266c1;}
+ .bulletin > .contBox > .tabMenuList ul{display: inline-block;}
+.bulletin > .contBox > .tabMenuList li.choicebulletin > a{color:#fff; font-weight: 500; position: relative;}
+.bulletin > .contBox > .tabMenuList li.choicebulletin > a::after{display: block; content: '>';position: absolute; top:10px; right:10px; width:20px; height: 10px; }
+.bulletin > .contBox > .tabMenuList li{border-radius: 100px; margin-bottom: 10px;}
+.bulletin > .contBox > .tabMenuList li:last-child{margin-bottom: 0;}
+.bulletin > .contBox > .tabMenuList li > a{display: block; width:100%; height: 100%; padding:10px 16px;}
+.bulletin > .contBox > .tabMenuList li:hover{background-color: #0091ea;}
+.bulletin > .contBox > .tabMenuCont{float:right; width:75%; padding:20px;}
+.bulletin > .contBox > .tabMenuCont > ul > li > a{font-size: 0;}
+.bulletin > .contBox > .tabMenuCont > ul > li > ul > li{margin-bottom: 18px; overflow: hidden;}
+.bulletin > .contBox > .tabMenuCont > ul > li > ul > li:last-child{margin-bottom: 0;}
+.bulletin > .contBox > .tabMenuCont > ul > li > ul > li > a{float:left; width: calc(100% - 150px); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+.bulletin > .contBox > .tabMenuCont > ul > li > ul > li > a > img{display: inline-block; width:14px; height: 14px;}
+.bulletin > .contBox > .tabMenuCont > ul > li > ul > li > p{float:right;}
+
+

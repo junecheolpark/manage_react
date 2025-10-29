@@ -12,7 +12,8 @@
 .tableView th { background-color: #fbfbfb; border-bottom: 1px solid #e1e1e1; font-size: 12px; height: 50px; }
 .tableView td { background-color: #fff; border-bottom: 1px solid #e1e1e1; text-align: left; height: 50px; }
 /* 필수항목 */
-.tableView th.esti { /*color: #ff0000;*/ background-image: url(/resources/images/bullet/bl_red.png); background-repeat: no-repeat; background-position: 7px center; background-size: 3px 12px; }
+/* .tableView th.esti { background-image: url(/public/images/bullet/bl_red.png); background-repeat: no-repeat; background-position: 7px center; background-size: 3px 12px; } */
+.tableView th.esti { background-repeat: no-repeat; background-position: 7px center; background-size: 3px 12px; }
 
 /*.tableView input[type=text],
 .tableView input[type=password],
@@ -137,7 +138,7 @@ div.contsTitle > img { vertical-align: middle; }
 .filebox input[type="file"] { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
 /* 달력 */
-input.cal { background-image: url(/resources/images/icon/ic_schedule_off.png); background-repeat: no-repeat; background-position: center right; padding-right: 30px; }
+input.cal { background-image: url(/public/images/icon/ic_schedule_off.png); background-repeat: no-repeat; background-position: center right; padding-right: 30px; }
 
 .contentsBox{ padding-top: 60px; height: 100vh;}
 .leftMenu{position: fixed; width:240px; background-color: #fff; height: 100vh; border-right:1px solid #ccc; z-index:9;}

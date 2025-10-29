@@ -98,7 +98,7 @@ footer {position: absolute; bottom: 50px; width: 100%; height: 50px; text-align:
 .topMenu > div.logo a{display: inline-block; width:130px;}
 .topMenu > div.logo a > img{width:100%;}
 
-#menuAll{display: none; position: absolute; z-index: 999; top:60px; left:0; width:100%; background-color: #fff; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);}
+#menuAll{ position: absolute; z-index: 999; top:60px; left:0; width:100%; background-color: #fff; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);}
 #menuAll > ul{display: flex; justify-content: center; padding:30px;}
 #menuAll > ul > li{flex-basis: 130px; text-align: center; margin-right: 10px;}
 #menuAll > ul > li:last-child{margin-right: 0;}
@@ -123,7 +123,7 @@ footer {position: absolute; bottom: 50px; width: 100%; height: 50px; text-align:
 .dim-layer .dimBg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #999; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* IE 5-7 */ filter: alpha(opacity=50); /* Netscape */ -moz-opacity: 5.0; /* Safari 1.x */ -khtml-opacity: 0.5; /* Good browsers */ opacity: 0.5; }
 
 /** 자동완성 검색 **/
-.ui-autocomplete-loading { background: url(/resources/images/ajax-loader-s.gif) no-repeat center; }
+.ui-autocomplete-loading { background: url(/public/images/ajax-loader-s.gif) no-repeat center; }
 .ui-autocomplete { max-height: 200px; overflow-y: auto; overflow-x: hidden; }
 .ui-menu-item { padding: 3px 6px; }
 .ui-menu-item strong { color: #006fc1; }

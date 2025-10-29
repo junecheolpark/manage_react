@@ -1,6 +1,19 @@
+import { Link, useNavigate } from "react-router-dom";
+// import 'common/css/jquery-ui.css';
+import 'common/css/layout.css';
+import 'common/css/sub.css';
+
+import { useState } from "react";
+
 function Header() {
-    const movePage = useNavigate();
-    import { useNavigate} from "react-router-dom";
+    // const movePage = useNavigate();
+
+    // 메뉴 열기/닫기
+    const [open, setOpen] = useState(false);
+
+    const toggle = () => {
+        setOpen(prev => !prev);
+    };
 
     return (
         <>
@@ -24,8 +37,10 @@ function Header() {
                 <div className="menuList">
                     <ul id="menuTop">
                         <li>
-                            <a href="#menu" className="menuToggle" id="btnMenu">
-                                <img src="/images/btn/btn_menu_open.png" alt="menuBtn" />
+                            <a href="#menu" className="menuToggle" id="btnMenu" onClick={toggle}>
+                                <img src={open
+                                    ? "/images/btn/btn_menu_close.png"
+                                    : "/images/btn/btn_menu_open.png"} alt="menuBtn" />
                             </a>
                         </li>
                         <li><a href="/report/01">업무보고</a></li>
@@ -34,44 +49,45 @@ function Header() {
                         <li><a href="/clipboard/01">게시판</a></li>
                         <li><a href="/system/01">시스템관리</a></li>
                     </ul>
-
-                    <div id="menuAll">
-                        <ul>
-                            <li>
-                                <a href="/report/01">주간업무</a>
-                                <ul>
-                                    <li><a href="/report/01">주간업무</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="/schedule/01">일정 관리</a>
-                                <ul>
-                                    <li><a href="/schedule/01">사내일정</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="/user/01">사용자 관리</a>
-                                <ul>
-                                    <li><a href="/user/01">사용자 관리</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="/clipboard/01">게시판</a>
-                                <ul>
-                                    <li><a href="/clipboard/01">공지사항</a></li>
-                                    <li><a href="/clipboard/02">자료실</a></li>
-                                    <li><a href="/clipboard/03">업무공유</a></li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="/system/01">시스템 관리</a>
-                                <ul>
-                                    <li><a href="/system/01">코드 관리</a></li>
-                                    <li><a href="/system/02">연차관리</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
+                    {open && (
+                        <div id="menuAll">
+                            <ul>
+                                <li>
+                                    <a href="/report/01">주간업무</a>
+                                    <ul>
+                                        <li><a href="/report/01">주간업무</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="/schedule/01">일정 관리</a>
+                                    <ul>
+                                        <li><a href="/schedule/01">사내일정</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="/user/01">사용자 관리</a>
+                                    <ul>
+                                        <li><a href="/user/01">사용자 관리</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="/clipboard/01">게시판</a>
+                                    <ul>
+                                        <li><a href="/clipboard/01">공지사항</a></li>
+                                        <li><a href="/clipboard/02">자료실</a></li>
+                                        <li><a href="/clipboard/03">업무공유</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="/system/01">시스템 관리</a>
+                                    <ul>
+                                        <li><a href="/system/01">코드 관리</a></li>
+                                        <li><a href="/system/02">연차관리</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
                 </div>
 
                 <div className="userInfo">
@@ -137,3 +153,4 @@ function Header() {
     )
 
 }
+export default Header;
