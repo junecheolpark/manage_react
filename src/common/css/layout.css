@@ -129,7 +129,7 @@ footer {position: absolute; bottom: 50px; width: 100%; height: 50px; text-align:
 .ui-menu-item strong { color: #006fc1; }
 .ui-menu-item .resultMenu { font-size: 14px; font-weight: 800; }
 
-#popUserInfo{display: none; position: absolute; top:70px; right:30px; width:300px; background-color: #fff; z-index: 999; border-radius: 12px; overflow: hidden; }
+#popUserInfo{position: absolute; top:70px; right:30px; width:300px; background-color: #fff; z-index: 999; border-radius: 12px; overflow: hidden; }
 #popUserInfo .btn-layerClose{position: absolute; top: 25px; right: 20px; z-index: 1;}
 /*캐릭터 배경 기본색 #eee 기본 이미지 no_Image.jpg*/
 #popUserInfo > .popInfoTop{height: 200px; background-color: #eee; padding:20px; position: relative;}

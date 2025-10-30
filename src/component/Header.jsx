@@ -9,10 +9,15 @@ function Header() {
     // const movePage = useNavigate();
 
     // 메뉴 열기/닫기
-    const [open, setOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [loginOpen, setLoginOpen] = useState(false);
 
-    const toggle = () => {
-        setOpen(prev => !prev);
+    const menuToggle = () => {
+        setMenuOpen(prev => !prev);
+    };
+
+    const loginToggle = () => {
+        setLoginOpen(prev => !prev);
     };
 
     return (
@@ -37,8 +42,8 @@ function Header() {
                 <div className="menuList">
                     <ul id="menuTop">
                         <li>
-                            <a href="#menu" className="menuToggle" id="btnMenu" onClick={toggle}>
-                                <img src={open
+                            <a href="#menu" className="menuToggle" id="btnMenu" onClick={menuToggle}>
+                                <img src={menuOpen
                                     ? "/images/btn/btn_menu_close.png"
                                     : "/images/btn/btn_menu_open.png"} alt="menuBtn" />
                             </a>
@@ -49,8 +54,8 @@ function Header() {
                         <li><a href="/clipboard/01">게시판</a></li>
                         <li><a href="/system/01">시스템관리</a></li>
                     </ul>
-                    {open && (
-                        <div id="menuAll">
+                    {menuOpen && (
+                        <div id="menuAll" >
                             <ul>
                                 <li>
                                     <a href="/report/01">주간업무</a>
@@ -92,7 +97,7 @@ function Header() {
 
                 <div className="userInfo">
                     <div className="user">
-                        <a href="#user">
+                        <a href="#user" onClick={loginToggle}>
                             <img
                                 src="/images/profile/s_profile_01.png"
                                 id="userCharacterS"
@@ -110,44 +115,45 @@ function Header() {
                         </a>
                     </div>
                 </div>
+                {loginOpen && (
+                    <div id="popUserInfo" className="shadowBox">
+                        <a href="#popclose" className="btn-layerClose">
+                            <img
+                                src="/images/btn/btn_popclose.png"
+                                alt="닫기"
+                            />
+                        </a>
 
-                <div id="popUserInfo" className="shadowBox">
-                    <a href="#popclose" className="btn-layerClose">
-                        <img
-                            src="/images/btn/btn_popclose.png"
-                            alt="닫기"
-                        />
-                    </a>
+                        <div className="popInfoTop">
+                            <img
+                                src="/images/common/no_Image.jpg"
+                                alt="유저"
+                                id="userCharacter"
+                                onError={(e) =>
+                                (e.currentTarget.src =
+                                    '/images/common/no_Image.jpg')
+                                }
+                            />
+                            <p id="userName">
+                                <span id="popLogNm" className="ftBold ftSize18 mgB5"></span>
+                                <span id="popLogDept" className="colGray2"></span>
+                            </p>
+                        </div>
 
-                    <div className="popInfoTop">
-                        <img
-                            src="/images/common/no_Image.jpg"
-                            alt="유저"
-                            id="userCharacter"
-                            onError={(e) =>
-                            (e.currentTarget.src =
-                                '/images/common/no_Image.jpg')
-                            }
-                        />
-                        <p id="userName">
-                            <span id="popLogNm" className="ftBold ftSize18 mgB5"></span>
-                            <span id="popLogDept" className="colGray2"></span>
-                        </p>
-                    </div>
-
-                    <div className="popInfoCont">
-                        <div id="popMyInfo">
-                            <ul>
-                                <li>
-                                    <a href="/login/logout" className="colRed">
-                                        <img src="/images/icon/ic_logout.png" alt="로그아웃" />
-                                        &nbsp;로그아웃
-                                    </a>
-                                </li>
-                            </ul>
+                        <div className="popInfoCont">
+                            <div id="popMyInfo">
+                                <ul>
+                                    <li>
+                                        <a href="/login/logout" className="colRed">
+                                            <img src="/images/icon/ic_logout.png" alt="로그아웃" />
+                                            &nbsp;로그아웃
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </section>
         </>
     )

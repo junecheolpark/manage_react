@@ -18,6 +18,21 @@ import 'common/css/common.css';
 
 
 function App() {
+
+  // # 링크 기본이동 방지
+  useEffect(() => { 
+    const handler = (e) => {
+      const el = e.target.closest("a");
+      if (!el) return;
+      const href = el.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        e.preventDefault(); // #, #memo 등 모두 방지
+      }
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
   // 로그인시
   if (true) {
     return (

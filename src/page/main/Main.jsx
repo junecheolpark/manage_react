@@ -1,7 +1,42 @@
 // import  './css/main.css'
+import React, { useState, useEffect } from "react";
 import style from './css/main.module.css'
 
 function Main() {
+    useEffect(() => {
+        document.addEventListener("click", (e) => {
+            const el = e.target.closest("a");
+            if (el && el.getAttribute("href") === "#") e.preventDefault();
+        });
+    }, []);
+
+    /* 메모 관련 */
+    const [memos, setMemos] = useState([]);
+
+    const handleAdd = (e) => {
+        e.preventDefault();
+        if (memos.length >= 5) {
+            alert("5개까지 추가 가능합니다.");
+            return;
+        }
+        setMemos([...memos, { id: Date.now(), text: "" }]);
+    };
+
+    const handleDelete = (id) => {
+        setMemos(memos.filter((m) => m.id !== id));
+    };
+
+    const handleChange = (id, value) => {
+        setMemos(memos.map((m) => (m.id === id ? { ...m, text: value } : m)));
+    };
+
+    const handleSave = (id) => {
+        const memo = memos.find((m) => m.id === id);
+        alert(`저장된 메모 내용:\n${memo.text}`);
+        // 실제 저장 로직(API 호출 등)은 여기서 처리
+    };
+
+/* 메모 관련 **/
 
     return (
         <section className={style.board}>
@@ -114,11 +149,40 @@ function Main() {
             <section className={style.myPlace}>
                 <p className="ftSize20 ftBold mP">
                     My Place&nbsp;&nbsp;
-                    <a href="#memo" onClick={() => { }}>
+                    <a href="#memo" onClick={handleAdd}>
                         <img src="/images/icon/ic_memo.png" alt="추가" />추가
                     </a>
                 </p>
-                <div className="mDiv" id="memoBox"></div>
+                <div className="mDiv" id="memoBox">
+                    {memos.map((memo) => (
+                        <div key={memo.id} className={style.memo}>
+                            <div className={style.placeTitle}>
+                                <div className="floatR" data-uidx="0" data-rdate="">
+                                    <button
+                                        className="btn btnS btnWhite memoSave"
+                                        onClick={() => handleSave(memo.id)}
+                                    >
+                                        저장
+                                    </button>
+                                    &nbsp;
+                                    <button
+                                        className="btn btnS btnBlueLine memoDel"
+                                        onClick={() => handleDelete(memo.id)}
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
+                                <textarea
+                                    rows="5"
+                                    cols="5"
+                                    className="txtMemo"
+                                    value={memo.text}
+                                    onChange={(e) => handleChange(memo.id, e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </section>
         </section>
     )
