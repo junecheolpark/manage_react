@@ -6,8 +6,10 @@ function HeadLeftLayout() {
     return (
         <>
             <Header />
-            <Lefter />
-            <Outlet />
+            <section className="contentsBox">
+                <Lefter />
+                <Outlet />
+            </section>
         </>
     )
 }

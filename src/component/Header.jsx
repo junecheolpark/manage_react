@@ -48,46 +48,46 @@ function Header() {
                                     : "/images/btn/btn_menu_open.png"} alt="menuBtn" />
                             </a>
                         </li>
-                        <li><a href="/report/01">업무보고</a></li>
-                        <li><a href="/schedule/01">일정관리</a></li>
-                        <li><a href="/user/01">사용자관리</a></li>
-                        <li><a href="/clipboard/01">게시판</a></li>
-                        <li><a href="/system/01">시스템관리</a></li>
+                        <li><Link to="/report/01">업무보고</Link></li>
+                        <li><Link to="/schedule/01">일정관리</Link></li>
+                        <li><Link to="/user/01">사용자관리</Link></li>
+                        <li><Link to="/board/01">게시판</Link></li>
+                        <li><Link to="/system/01">시스템관리</Link></li>
                     </ul>
                     {menuOpen && (
                         <div id="menuAll" >
                             <ul>
                                 <li>
-                                    <a href="/report/01">주간업무</a>
+                                    <Link to="/report/01">주간업무</Link>
                                     <ul>
-                                        <li><a href="/report/01">주간업무</a></li>
+                                        <li><Link to="/report/01">주간업무</Link></li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="/schedule/01">일정 관리</a>
+                                    <Link to="/schedule/01">일정 관리</Link>
                                     <ul>
-                                        <li><a href="/schedule/01">사내일정</a></li>
+                                        <li><Link to="/schedule/01">사내일정</Link></li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="/user/01">사용자 관리</a>
+                                    <Link to="/user/01">사용자 관리</Link>
                                     <ul>
-                                        <li><a href="/user/01">사용자 관리</a></li>
+                                        <li><Link to="/user/01">사용자 관리</Link></li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="/clipboard/01">게시판</a>
+                                    <Link to="/board/01">게시판</Link>
                                     <ul>
-                                        <li><a href="/clipboard/01">공지사항</a></li>
-                                        <li><a href="/clipboard/02">자료실</a></li>
-                                        <li><a href="/clipboard/03">업무공유</a></li>
+                                        <li><Link to="/board/01">공지사항</Link></li>
+                                        <li><Link to="/board/02">자료실</Link></li>
+                                        <li><Link to="/board/03">업무공유</Link></li>
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="/system/01">시스템 관리</a>
+                                    <Link to="/system/01">시스템 관리</Link>
                                     <ul>
-                                        <li><a href="/system/01">코드 관리</a></li>
-                                        <li><a href="/system/02">연차관리</a></li>
+                                        <li><Link to="/system/01">코드 관리</Link></li>
+                                        <li><Link to="/system/02">연차관리</Link></li>
                                     </ul>
                                 </li>
                             </ul>
