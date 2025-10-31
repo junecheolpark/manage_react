@@ -26,7 +26,8 @@ const Report_01 = () => {
 
     const [year, setYear] = useState(currentYear);
     const [month, setMonth] = useState(defaultMonth);
-    const [weeks, setWeeks] = useState([]);
+    const [week, setWeek] = useState();
+    const [weekArr, setWeekArr] = useState([]);
 
     // 예: 2025년부터 올해까지 역순 리스트 만들기
     const years = [];
@@ -35,57 +36,110 @@ const Report_01 = () => {
     }
 
     const yearChange = (e) => {
-        setYear(Number(e.target.value));
+        const newYear = Number(e.target.value);
+        setYear(newYear);
+        const newWeeks = getWeeksOfMonth(newYear, month);
+        setWeekArr(newWeeks);
+        setWeek(newWeeks[0].week);
     };
 
     const monThChange = (e) => {
-        setMonth(e.target.value);
+        const newMonth = e.target.value;
+        setMonth(newMonth);
+        const newWeeks = getWeeksOfMonth(year, newMonth);
+        setWeekArr(newWeeks);
+        setWeek(newWeeks[0].week);
     };
 
+    const weekChange = (e) => {
+        setWeek(Number(e.target.value));
+    };
+
+    // 해당 주의 시작일(월요일)과 종료일(금요일), 몇 번째 주인지 반환
+    const fewWeeks = (current) => {
+        const monday = new Date(current); // 월요일
+        const friday = new Date(current); // 금요일
+        friday.setDate(monday.getDate() + 4);
+
+        const startYearDay = new Date(`1/1/${monday.getFullYear()}`); // 해당 연도의 1월 1일
+
+        const diffDay = (monday - startYearDay) / 86400000; // 일수 차이 계산 (1일 = 1000 * 60 * 60 * 24 = 86400000)
+        let weekDay = parseInt(diffDay / 7) + 1; // 몇 번째 주인지 계산
+        if (monday.getDay() < startYearDay.getDay()) weekDay += 1; // 연초(1월 1일)가 월요일이 아닐 때 주 계산
+
+        return { week: weekDay, start: monday.toISOString().slice(0, 10).split('-'), end: friday.toISOString().slice(0, 10).split('-') };
+    }
+
+    // 해당 연도, 월의 주차 배열 반환
     const getWeeksOfMonth = (year, month) => {
-        const weeks = [];
-        const start = new Date(year, month - 1, 1);
-        const end = new Date(year, month, 0);
+        const weekArr = [];
+        const start = new Date(year, month - 1, 1); // 해당 월의 첫 날
+        const end = new Date(year, month, 0); // 해당 월의 마지막 날
+        let current = new Date(start); // 현재 날짜를 첫 날로 초기화
 
-        let current = new Date(start);
-        // 첫 번째 주의 월요일로 이동
-        current.setDate(current.getDate() - ((current.getDay() + 6) % 7));
-
+        current.setDate(current.getDate() - ((current.getDay() + 6) % 7)); // 해당 달의 첫째 날을 포함한 주의 월요일
         while (current <= end) {
-            const monday = new Date(current);
-            const friday = new Date(current);
-            friday.setDate(monday.getDate() + 4);
-
-            const startYearDay = new Date(`1/1/${monday.getFullYear()}`);
-            const today = new Date(`${monday.getMonth() + 1}/${monday.getDate()}/${monday.getFullYear()}`);
-            const diffDay = (today - startYearDay) / 86400000;
-            let weekDay = parseInt(diffDay / 7) + 1;
-            if (today.getDay() < startYearDay.getDay()) weekDay += 1; // 1월1일부터 지난 후 계산
-            weeks.push({
-                week: weekDay,
-                start: monday,
-                end: friday,
-                label: `${monday.getFullYear()}년 ${String(monday.getMonth() + 1).padStart(2, "0")}월 ${String(monday.getDate()).padStart(2, "0")}일 ~ ${friday.getFullYear()}년 ${String(friday.getMonth() + 1).padStart(2, "0")}월 ${String(friday.getDate()).padStart(2, "0")}일`,
+            const result = fewWeeks(current);
+            weekArr.push({
+                week: result.week,
+                start: result.start,
+                end: result.end,
+                // label: `${result.start.getFullYear()}년 ${String(result.start.getMonth() + 1).padStart(2, "0")}월 ${String(result.start.getDate()).padStart(2, "0")}일 ~ ${result.end.getFullYear()}년 ${String(result.end.getMonth() + 1).padStart(2, "0")}월 ${String(result.end.getDate()).padStart(2, "0")}일`,
+                label: `${result.start[0]}년 ${result.start[1]}월 ${result.start[2]}일 ~ ${result.end[0]}년 ${result.end[1]}월 ${result.end[2]}일`,
             });
 
             current.setDate(current.getDate() + 7); // 다음 주로 이동
         }
 
-        return weeks;
+        return weekArr;
     }
+
+    // 주 변경 (전주 / 다음주 버튼)
+    const updateWeek = (weekTp) => {
+        const weekNum = week + weekTp;
+        // 존재하는 주차인지 확인
+        if (weekArr.some(imtem => imtem.week === (weekNum))) {
+            setWeek(weekNum);
+
+        }else{ // 존재하지않으면 년/월 세팅
+            // 이전 주 버튼 클릭 시
+            if (weekTp === -1) {
+                const check = weekArr[0].start[1] === '12';
+                const prevMonth = check ? '12' : String(Number(month) - 1).padStart(2, "0");
+                const prevYear = check ? year - 1 : year;
+                const newWeeks = getWeeksOfMonth(prevYear, prevMonth);
+                const checkWeekNum = check ? newWeeks[newWeeks.length - 1].week : weekNum;
+                setWeekArr(newWeeks);
+                setYear(prevYear);
+                setMonth(prevMonth);
+                setWeek(checkWeekNum);
+            } else {
+                // 다음 주 버튼 클릭 시
+                const check = weekArr[weekArr.length - 1].end[1] === '01';
+                const nextMonth = check ? '01' : String(Number(month) + 1).padStart(2, "0");
+                const nextYear = check ? year + 1 : year;
+                const newWeeks = getWeeksOfMonth(nextYear, nextMonth);
+                const checkWeekNum = check ? newWeeks[0].week : weekNum;
+                setWeekArr(newWeeks);
+                setYear(nextYear);
+                setMonth(nextMonth);
+                setWeek(checkWeekNum);
+            }
+        }
+    };
 
     useEffect(() => {
         const newWeeks = getWeeksOfMonth(year, month);
-        setWeeks(newWeeks);
-    }, [year, month]);
+        setWeekArr(newWeeks);
 
-    // 주 변경 (전주 / 다음주 버튼)
-    const updateWeek = (direction) => {
-    };
+        // 첫 로딩 시 현재 주로 설정 또는 month, year 변경 시 첫 주로 설정
+        if (!week) {
+            const toMonday = new Date(new Date().setDate(new Date().getDate() - ((new Date().getDay() + 6) % 7)));
+            const thisWeek = fewWeeks(toMonday);
+            setWeek(thisWeek.week);
 
-
-
-
+        }
+    }, []);
 
     return (
         <section className="contens">
@@ -151,7 +205,7 @@ const Report_01 = () => {
             {/* 검색 박스 */}
             <section className={`schBox ${style.reSchBox}`}>
                 <section className="txtC">
-                    <a className={style.btnWeekPre} id="btnWeekPre" href="#" onClick={() => updateWeek("prev")}>
+                    <a className={style.btnWeekPre} id="btnWeekPre" href="#" onClick={() => updateWeek(-1)}>
                         <img
                             src="/images/btn/btn_bleft.png"
                             alt="이전"
@@ -181,15 +235,15 @@ const Report_01 = () => {
                         <option value="12">12월</option>
                     </select>
                     &nbsp;
-                    <select id="selWeek" style={{ width: "290px" }}>
-                        {weeks.map((w, idx) => (
+                    <select id="selWeek" style={{ width: "290px" }} value={week} onChange={weekChange}>
+                        {weekArr.map((w, idx) => (
                             <option key={idx} value={w.week}>
                                 {w.label}
                             </option>
                         ))}
                     </select>
                     &nbsp;
-                    <a className={style.btnWeekNext} id="btnWeekNext" href="#" onClick={() => updateWeek("next")}>
+                    <a className={style.btnWeekNext} id="btnWeekNext" href="#" onClick={() => updateWeek(1)}>
                         <img
                             src="/images/btn/btn_nright.png"
                             alt="다음"
