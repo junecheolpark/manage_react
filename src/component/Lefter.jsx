@@ -1,9 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
+import React, { useContext } from "react";
+import { LeftEventContext } from "component/layout/HeadLeftLayout";
 
 function Lefter() {
+    // "/report/01", "/schedule/01", "/system/02" 버튼 클릭시 이벤트 실행
+    const { onRegister } = useContext(LeftEventContext);
+
+    const handleClick = (e) => {
+        e.preventDefault();
+        if (onRegister) onRegister(); // 현재 페이지가 지정한 함수 실행
+        else alert("등록 기능이 없는 페이지입니다.");
+    };
+    //*********************************************************** */
+
     const location = useLocation();
-    const path = location.pathname; // ex) /report/01
-    const section = path.split("/")[1]; // ex) report
+    const path = location.pathname; // 현재 페이지 경로 추출
+    const section = path.split("/")[1]; // ["", "report", "01"] ->  report 만가져옴
 
     const leftMenus = {
         report: [{ navi: "주간업무", name: "주간업무", url: "/report/01" }],
@@ -20,17 +32,19 @@ function Lefter() {
         ],
     };
 
-    const arrMenu = leftMenus[section] || [];
-    console.log(path)
+    const arrMenu = leftMenus[section] || []; // 없을 경우  오류 대신 []반환
     // 현재 메뉴 찾기
     const currentMenu = arrMenu.find((item) => item.url === path);
 
-    
+
+    // 등록 버튼을 보여줄 섹션 정의
+    const showRegisterSections = ["/report/01", "/schedule/01", "/system/02"];
+    const showRegister = showRegisterSections.includes(path);
+
     return (
         <section className="leftMenu">
             <section className="lmTop">
                 <p id="pageNavi" className="ftSize20 ftBold mgB10">
-                    &nbsp;&nbsp;
                     {currentMenu && (
                         <>
                             {currentMenu.navi}
@@ -39,17 +53,18 @@ function Lefter() {
                         </>
                     )}
                 </p>
-
-                <div id="leftTop">
-                    {/* 업무보고,일정관리,연차관리 */}
-                    <div id="leftTopRpt01" className="leftTopConts">
-                        <div className="ucTable">
-                            <a href="#reg" className="btn btn100 btnBlue">
-                                등록
-                            </a>
+                {showRegister && (
+                    <div id="leftTop">
+                        {/* 업무보고,일정관리,연차관리 */}
+                        <div id="leftTopRpt01" className="leftTopConts" onClick={handleClick}>
+                            <div className="ucTable">
+                                <a href="#reg" className="btn btn100 btnBlue">
+                                    등록
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </section>
 
             <section className="lmMenu">

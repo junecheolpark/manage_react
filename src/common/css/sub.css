@@ -155,7 +155,7 @@ input.cal { background-image: url(/public/images/icon/ic_schedule_off.png); back
 .leftMenu >.lmMenu > ul > li.lmChoice > a{color:#0091ea; padding: 10px 20px;}
 
 #leftTop {overflow: hidden;}
-#leftTop .leftTopConts {display:none;}
+/* #leftTop .leftTopConts {display:none;} */
 
 #leftTopRpt01 .ucTable > div {width: 50%;}
 #leftTopRpt01 .ucTable > div > p {display: block; width:100%; padding:4px 10px; border:1px solid #ccc; border-radius:4px;}

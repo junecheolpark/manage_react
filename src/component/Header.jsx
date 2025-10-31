@@ -33,9 +33,9 @@ function Header() {
             <section className="topMenu">
                 <div className="logo">
                     <h1>
-                        <a href="/index">
+                        <Link to="/">
                             <img src="/images/index/logo.png" alt="junecheol" />
-                        </a>
+                        </Link>
                     </h1>
                 </div>
 

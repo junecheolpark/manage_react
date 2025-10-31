@@ -1,5 +1,5 @@
-// import  './css/main.css'
 import React, { useState, useEffect } from "react";
+// import  './css/main.css'
 import style from './css/main.module.css'
 
 function Main() {
