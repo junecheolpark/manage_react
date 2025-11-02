@@ -64,12 +64,11 @@ const Report_01 = () => {
         friday.setDate(monday.getDate() + 4);
 
         const startYearDay = new Date(`1/1/${monday.getFullYear()}`); // 해당 연도의 1월 1일
-
         const diffDay = (monday - startYearDay) / 86400000; // 일수 차이 계산 (1일 = 1000 * 60 * 60 * 24 = 86400000)
         let weekDay = parseInt(diffDay / 7) + 1; // 몇 번째 주인지 계산
         if (monday.getDay() < startYearDay.getDay()) weekDay += 1; // 연초(1월 1일)가 월요일이 아닐 때 주 계산
 
-        return { week: weekDay, start: monday.toISOString().slice(0, 10).split('-'), end: friday.toISOString().slice(0, 10).split('-') };
+        return { week: weekDay, start: monday.toLocaleDateString('sv-SE').split('-'), end: friday.toLocaleDateString('sv-SE').split('-') };
     }
 
     // 해당 연도, 월의 주차 배열 반환
@@ -79,9 +78,13 @@ const Report_01 = () => {
         const end = new Date(year, month, 0); // 해당 월의 마지막 날
         let current = new Date(start); // 현재 날짜를 첫 날로 초기화
 
-        current.setDate(current.getDate() - ((current.getDay() + 6) % 7)); // 해당 달의 첫째 날을 포함한 주의 월요일
+        // 1일이 토요일,일요일이면 다음날(월요일)로 이동
+        if (current.getDay() === 6 || current.getDay() === 0) current.setDate(current.getDate() + 1);
+        else current.setDate(current.getDate() - ((current.getDay() + 6) % 7));
+
         while (current <= end) {
             const result = fewWeeks(current);
+
             weekArr.push({
                 week: result.week,
                 start: result.start,
@@ -98,17 +101,18 @@ const Report_01 = () => {
 
     // 주 변경 (전주 / 다음주 버튼)
     const updateWeek = (weekTp) => {
-        const weekNum = week + weekTp;
-        // 존재하는 주차인지 확인
-        if (weekArr.some(imtem => imtem.week === (weekNum))) {
+        const prevWeek = weekTp === -1 && month === '01' && week === weekArr[1].week; //  이전버튼 클릭시 month 1월2째주라면
+        const nextWeek = weekTp === 1 && month === '01' && week === weekArr[0].week; //  다음버튼 클릭시 month 1월1째주라면
+        const weekNum = prevWeek ? weekArr[0].week : nextWeek ? weekArr[1].week : week + weekTp; // 1월에 12월이 껴있을수 있기때문에 비교처리
+
+        if (weekArr.some(item => item.week === (weekNum))) {  // 존재하는 주차인지 확인
             setWeek(weekNum);
 
-        }else{ // 존재하지않으면 년/월 세팅
-            // 이전 주 버튼 클릭 시
-            if (weekTp === -1) {
-                const check = weekArr[0].start[1] === '12';
-                const prevMonth = check ? '12' : String(Number(month) - 1).padStart(2, "0");
-                const prevYear = check ? year - 1 : year;
+        } else { // 존재하지않으면 년/월 세팅
+            if (weekTp === -1) {  // 이전 주 버튼 클릭 시
+                const check = weekArr[1].start[1] === '01'; // 이번달이 1월이라면
+                const prevMonth = check ? '12' : String(Number(month) - 1).padStart(2, "0"); // 이전 달 
+                const prevYear = check ? year - 1 : year; // 이전 연도
                 if (2025 > prevYear) { alert("더이상 이전 연도로 이동할 수 없습니다."); return; }
 
                 const newWeeks = getWeeksOfMonth(prevYear, prevMonth);
@@ -117,16 +121,15 @@ const Report_01 = () => {
                 setYear(prevYear);
                 setMonth(prevMonth);
                 setWeek(checkWeekNum);
-            } else {
-                // 다음 주 버튼 클릭 시
-                const check = weekArr[weekArr.length - 1].end[1] === '01';
+            } else { // 다음 주 버튼 클릭 시
+                const check = weekArr[weekArr.length - 1].start[1] === '12'; // 이번달이 12월이라면
                 const nextMonth = check ? '01' : String(Number(month) + 1).padStart(2, "0");
                 const nextYear = check ? year + 1 : year;
-                console.log(nextMonth)
                 if (nextYear > currentYear + 1) { alert("더이상 다음 연도로 이동할 수 없습니다."); return; }
 
                 const newWeeks = getWeeksOfMonth(nextYear, nextMonth);
                 const checkWeekNum = check ? newWeeks[0].week : weekNum;
+                console.log(checkWeekNum);
                 setWeekArr(newWeeks);
                 setYear(nextYear);
                 setMonth(nextMonth);
