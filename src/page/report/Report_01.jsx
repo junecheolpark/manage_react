@@ -51,6 +51,8 @@ const Report_01 = () => {
         setWeek(newWeeks[0].week);
     };
 
+    //*********************주차 관련******************************** */
+    
     const weekChange = (e) => {
         setWeek(Number(e.target.value));
     };
@@ -107,6 +109,8 @@ const Report_01 = () => {
                 const check = weekArr[0].start[1] === '12';
                 const prevMonth = check ? '12' : String(Number(month) - 1).padStart(2, "0");
                 const prevYear = check ? year - 1 : year;
+                if (2025 > prevYear) { alert("더이상 이전 연도로 이동할 수 없습니다."); return; }
+
                 const newWeeks = getWeeksOfMonth(prevYear, prevMonth);
                 const checkWeekNum = check ? newWeeks[newWeeks.length - 1].week : weekNum;
                 setWeekArr(newWeeks);
@@ -118,6 +122,9 @@ const Report_01 = () => {
                 const check = weekArr[weekArr.length - 1].end[1] === '01';
                 const nextMonth = check ? '01' : String(Number(month) + 1).padStart(2, "0");
                 const nextYear = check ? year + 1 : year;
+                console.log(nextMonth)
+                if (nextYear > currentYear + 1) { alert("더이상 다음 연도로 이동할 수 없습니다."); return; }
+
                 const newWeeks = getWeeksOfMonth(nextYear, nextMonth);
                 const checkWeekNum = check ? newWeeks[0].week : weekNum;
                 setWeekArr(newWeeks);
@@ -140,6 +147,8 @@ const Report_01 = () => {
 
         }
     }, []);
+
+    //*********************************************************** */
 
     return (
         <section className="contens">
