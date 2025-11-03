@@ -1,70 +1,65 @@
-# Getting Started with Create React App
+🧭 프로젝트 개요
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Java(Spring MVC) 기반 사내 관리 시스템의 프론트엔드를 React로 재구성한 프로젝트입니다.
+기존 JSP 화면을 컴포넌트 단위로 리팩토링하고, Axios를 통한 REST API 연동 구조를 설계했습니다.
 
-## Available Scripts
+⚙️ 기술 스택
+Frontend
 
-In the project directory, you can run:
+React 19
 
-### `npm start`
+Redux / Redux-Persist
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Axios, React Router
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+CSS Modules
 
-### `npm test`
+ESLint
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Backend (연동 API)
 
-### `npm run build`
+Java 11, Spring MVC
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+PostgreSQL
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Infra / DevOps
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+GitHub Actions (CI/CD)
 
-### `npm run eject`
+🧩 주요 기능
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+📅 월간 일정 관리 (FullCalendar 기반)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+🧾 업무보고 / 회의록 / 게시판 관리
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+⚙️ 사용자 및 시스템 코드 관리
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+📬 연차 관리
 
-## Learn More
+🧑‍💻 담당 역할
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+기존 JSP 화면을 React로 변환
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+공용 컴포넌트 및 상태 관리 설계
 
-### Code Splitting
+Axios를 이용한 백엔드 REST API 통신
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Render 서버 환경 세팅 및 PostgreSQL 연결
 
-### Analyzing the Bundle Size
+🪄 아키텍처 요약
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+AS-IS
 
-### Making a Progressive Web App
+Java Spring MVC + JSP
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+jQuery + Ajax
 
-### Advanced Configuration
+PostgreSQL (로컬 DB)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+TO-BE
 
-### Deployment
+React + Axios + Redux 구조
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Spring API 서버와 REST 통신
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Render 배포 + PostgreSQL 클라우드 DB
