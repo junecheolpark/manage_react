@@ -1,0 +1,103 @@
+﻿input[type=checkbox] {width: 18px;height: 18px;border: 1px solid #e4e4e4;accent-color: #FFC12E;}
+/* file */
+.filebox label {font-weight:400; display: inline-block; width: auto;cursor: pointer; padding: 6px 15px; margin-left: 0; border-radius: 5px; vertical-align: middle; border: 1px solid #ddd; background-color: #fff; color: #000; }
+.filebox.dragbox label {padding: 0 7px;}
+.filebox input[type="file"], .filedragbox input[type="file"] { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+.schBox select { width: 100px; }
+.schBox > div { margin: 0 auto; text-align: center; }
+
+#btnPrev > img, #btnNext > img {width:25px; vertical-align: middle !important;}
+.fc-toolbar, .vacationShow { display: none; }
+/*.fc-toolbar .fc-left { display: none; }*/
+
+.ui-widget button.fc-prev-button, .ui-widget button.fc-next-button { background: none; border: none; font: bold 12px Dotum; color: #333; }
+.ui-widget button.fc-prev-button { padding-right: 30px; }
+.ui-widget button.fc-next-button { padding-left: 30px; }
+.ui-widget button.fc-today-button { border-color: #a7c2dc; background-color: #fff; font-weight: bold; border-radius: 0; padding: 0 20px; }
+
+.fc-day-header.ui-widget-header { background-color: #f3f3f3; padding: 10px 0; }
+.fc-day-header.ui-widget-header span { color: #003c76; font-weight: bold; }
+/*.fc-content-skeleton { min-height: 100px; }*/
+.ui-widget-content { background: none; }
+
+.fc-view > table { border: 1px solid #d7d7d7; border-top: 3px solid #002157; }
+.fc-view > table thead { border: none; }
+.fc-view > table thead td, .ui-widget-header table th { border: 1px solid #d7d7d7; }
+
+.ui-widget-header { background: #fff; color: #444; font-weight: normal; }
+/*.ui-widget-header table th { background: #f3f6fb url(/images/bullet/th_line3.gif) right center no-repeat; }*/
+/*.ui-widget-header table th:last-child { background: #fff; background-image: none; }*/
+.ui-widget-header, .fc-view td { border: 1px solid #ddd; }
+
+a.fc-event { border: none; cursor: pointer; background-color: #ffffff00;/*  padding: 3px; margin: 2px; border: solid 1px #949494; border-radius: 8px; */}
+.titleBox {padding:3px; margin: 2px; border-radius: 8px; background-color: white;}
+.boxCol1 {border: solid 1px #ccc;} /* 신청 */
+.boxCol2 {border: solid 1px #60D07E;} /* 승인 */
+.boxCol3 {border: solid 1px #FF5C48;} /* 취소 */
+.boxCol4 {border: solid 1px #0091EA;} /* 외근 */
+.boxCol5 {border: solid 1px black;} /* 기타 */
+.fc-title span { font-size: 11px; }
+
+.fc-title { font-size: 11px; color: #000000; }
+a.fc-event:hover{ color: #3a87ad; }
+.holiday {color: #ff0000;  padding: 2px;}
+.inOut {font-size: 11px; font-weight: bold; color: #0091ea;}
+
+.fc-day-grid-event .fc-content { word-break: keep-all; word-wrap: break-word; font-size: 12px; /*background-color: #003c76;*/ }
+/*.fc-day-number > * { font-size: 10px; }*/
+
+.conts p { color: #fff; }
+.conts p span { display: block; background-color: #e1f0ff; border-radius: 2px; padding-top: 2px; }
+
+.fc-day-header.ui-widget-header.fc-sun span, .fc-sun span { color: red; }
+.fc-day-header.ui-widget-header.fc-sat span, .fc-sat span { color: blue; }
+
+.fc-basic-view .fc-body .fc-row { min-height: 3em; }
+
+.fc-day.ui-widget-content.sch-on { background-color: #003c76; }
+.fc-day-top.sch-on .fc-day-number { color: #fff; }
+
+#scheduleView .autoSizeLayer { width: 1300px; } /*1700px*/
+
+#agreeView { display: none; position: absolute; padding: 15px; background-color: #fff; border: 2px solid #065687; margin: -215px 0 0 200px; line-height: 20px; font-size: 14px; font-weight: bold; }
+#agreeView p { margin-top: 15px; text-align: center; }
+
+.btnConf, #eduMDView { display: none; }
+
+#auditBody { display: table; width: 100%; margin-top: 10px; }
+#auditBody .auditBodyCell { display: table-cell; width: 50%; }
+#auditBody .auditBodyCell:nth-child(2) { padding-left: 10px; }
+
+#confView { display: inline-block; width: 400px; text-align: left; }
+
+#scheduleInputView .autoSizeLayer { width: 500px; }
+#txtConts { height: 100px; }
+#etcTxtView, #btnDelete { display: none; }
+#scheduleTypeList label { display: inline-block; margin-right: 15px; }
+.etcsch { background: #eee; cursor: pointer; }
+.usersch { background: #e0e5ff; cursor: pointer; }
+
+#userScheduleView .inputView { display: none; }
+#userScheduleView .inputView div { background-color: #f3f3f3; border: 1px solid #d7d7d7; border-radius: 5px; padding: 10px; margin-bottom: 10px; }
+#userScheduleView .inputView p { margin-bottom: 5px; }
+#userScheduleView .inputView p:last-child { margin-bottom: 0; }
+#userScheduleView .inputView span { font-size: 14px; }
+#userScheduleView .inputView textarea { font-size: 14px; border-radius: 5px; padding: 10px; }
+#lblVacationType { float: right; }
+
+#targetList {display: table; width: 100%;}
+#targetList p {display: table-cell;}
+#targetList p:nth-child(1) {width: 80%;}
+#targetList p:nth-child(2) {width: 20%;}
+#ToName {text-align: left;}
+#btnUser {text-align: right;}
+
+/* 잔여 연차 확인 - 추가230111*/
+.autoSizeLayerContBody > ul{ padding:10px 5px; margin-bottom: 10px;}
+.autoSizeLayerContBody > ul > li{display:inline-block; width:24%;}
+.autoSizeLayerContBody > ul > li > p{text-align:center; }
+.autoSizeLayerContBody > ul > li > p > span{position:relative; display: block;}
+.autoSizeLayerContBody > ul > li > p > span:first-child{margin-bottom: 10px;}
+.autoSizeLayerContBody > ul > li > p > span:last-child > span{padding:4px 4px 4px 30px; background-color:#f2f2f2; border-radius:5px;}

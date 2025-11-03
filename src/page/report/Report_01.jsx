@@ -98,6 +98,7 @@ const Report_01 = () => {
 
         return weekArr;
     }
+    
 
     // 주 변경 (전주 / 다음주 버튼)
     const updateWeek = (weekTp) => {
@@ -129,7 +130,6 @@ const Report_01 = () => {
 
                 const newWeeks = getWeeksOfMonth(nextYear, nextMonth);
                 const checkWeekNum = check ? newWeeks[0].week : weekNum;
-                console.log(checkWeekNum);
                 setWeekArr(newWeeks);
                 setYear(nextYear);
                 setMonth(nextMonth);

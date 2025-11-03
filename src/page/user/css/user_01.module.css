@@ -1,0 +1,5 @@
+﻿.userManagement{display: grid; margin-top: 15px; grid-template-columns: 1fr .7fr;}
+.userManagement > section{padding:15px;}
+.userManagement > section:first-child{margin-right: 10px;}
+
+.btnDelete {display: none;}
