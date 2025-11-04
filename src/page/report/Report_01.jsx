@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { LeftEventContext } from "component/layout/HeadLeftLayout";
-import { fnLayerPopupView } from 'common/js/function';
+import { fnLayerPopupView, fnSelYear } from 'common/js/function';
 
 // import './css/report_01.css'
 import style from './css/report_01.module.css'
@@ -30,10 +30,7 @@ const Report_01 = () => {
     const [weekArr, setWeekArr] = useState([]);
 
     // 예: 2025년부터 올해까지 역순 리스트 만들기
-    const years = [];
-    for (let i = currentYear + 1; i >= 2025; i--) {
-        years.push(i);
-    }
+    const years = fnSelYear(2025, (currentYear - 2025 + 1), false, '년');
 
     const yearChange = (e) => {
         const newYear = Number(e.target.value);
@@ -226,8 +223,8 @@ const Report_01 = () => {
                     &nbsp;
                     <select id="selYear" style={{ width: "100px" }} value={year} onChange={yearChange}>
                         {years.map((y) => (
-                            <option key={y} value={y}>
-                                {y}년
+                            <option key={y.value} value={y.value}>
+                                {y.label}
                             </option>
                         ))}
                     </select>

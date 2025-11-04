@@ -1,0 +1,51 @@
+﻿/* FullCalendar 커스텀 스타일 */
+.ui-widget button.fc-prev-button, .ui-widget button.fc-next-button { background: none; border: none; font: bold 12px Dotum; color: #333; }
+.ui-widget button.fc-prev-button { padding-right: 30px; }
+.ui-widget button.fc-next-button { padding-left: 30px; }
+.ui-widget button.fc-today-button { border-color: #a7c2dc; background-color: #fff; font-weight: bold; border-radius: 0; padding: 0 20px; }
+
+.fc-day-header.ui-widget-header { background-color: #f3f3f3; padding: 10px 0; }
+.fc-day-header.ui-widget-header span { color: #003c76; font-weight: bold; }
+.ui-widget-content { background: none; }
+
+.fc-view > table { border: 1px solid #d7d7d7; border-top: 3px solid #002157; }
+.fc-view > table thead { border: none; }
+.fc-view > table thead td, .ui-widget-header table th { border: 1px solid #d7d7d7; }
+
+.ui-widget-header { background: #fff; color: #444; font-weight: normal; }
+.ui-widget-header, .fc-view td { border: 1px solid #ddd; }
+
+.fc-event { border: none; cursor: pointer; background-color: #ffffff00;/*  padding: 3px; margin: 2px; border: solid 1px #949494; border-radius: 8px; */}
+.fc-event:hover{ color: #3a87ad; }
+
+.titleBox {padding:3px; margin: 2px; border-radius: 8px; background-color: white;}
+.boxCol1 {border: solid 1px #ccc;} /* 신청 */
+.boxCol2 {border: solid 1px #60D07E;} /* 승인 */
+.boxCol3 {border: solid 1px #FF5C48;} /* 취소 */
+.boxCol4 {border: solid 1px #0091EA;} /* 외근 */
+.boxCol5 {border: solid 1px black;} /* 기타 */
+.fc-title span { font-size: 11px; }
+
+.fc-title { font-size: 11px; color: #000000; }
+.holiday {color: #ff0000;  padding: 2px;}
+.inOut {font-size: 11px; font-weight: bold; color: #0091ea;}
+
+.fc-day-grid-event .fc-content { word-break: keep-all; word-wrap: break-word; font-size: 12px; /*background-color: #003c76;*/ }
+
+/* .conts p { color: #fff; }
+.conts p span { display: block; background-color: #e1f0ff; border-radius: 2px; padding-top: 2px; } */
+
+/* 일요일 날짜: 빨간*/
+.fc .fc-day-sun a {color: red;}
+  
+/* 토요일 날짜: 파란색 */
+.fc .fc-day-sat a {color: blue;}
+
+
+.fc-basic-view .fc-body .fc-row { min-height: 3em; }
+
+.fc-day.ui-widget-content.sch-on { background-color: #003c76; }
+.fc-day-top.sch-on .fc-day-number { color: #fff; }
+
+/* 날짜 숫자 z-index 초기화 */
+/* .fc .fc-daygrid-day-number {   z-index: auto !important;} */

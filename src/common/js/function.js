@@ -43,3 +43,27 @@ export function fnLayerPopupView(id, show = true) {
         }, 300);
     }
 }
+
+/**
+* 년도 설정
+* @param {number} stYear : 시작 년도
+* @param {number} addYear : 현재 년도 기준 + addYear
+* @param {boolean} blBlank : 선택 option 추가함/추가 안함 (true, false)
+* @param {string} txt : 년도 숫자 뒤에 붙일 텍스트
+ */
+export function fnSelYear(stYear, addYear, blBlank, txt) {
+	const arr = [];
+	const date = new Date();
+	const year = date.getFullYear();
+
+	 // 선택 항목 (옵션)
+    if (blBlank) arr.push({ value: 0, label: "선택" });
+
+    // stYear부터 현재년도+addYear까지
+    for (let i = stYear; i <= year + addYear; i++) {
+        arr.push({ value: i, label: `${i}${txt}` });
+    }
+
+    return arr; // 배열 반환
+
+}
