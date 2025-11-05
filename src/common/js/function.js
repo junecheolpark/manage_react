@@ -67,3 +67,38 @@ export function fnSelYear(stYear, addYear, blBlank, txt) {
     return arr; // 배열 반환
 
 }
+
+/**
+ * 입력 검증 함수
+ * @param {string|number} value 입력값
+ * @param {string} label 필드명 (ex: "아이디", "비밀번호")
+ * @param {string} type 검사유형 ('select', 'num' 등)
+ * @returns {boolean} true = 통과 / false = 실패
+ */
+export const fnAlertReturn = (value, label, type) => {
+    const trimmed = String(value ?? "").trim();
+    // 숫자만 허용하는 헬퍼
+    const onlyNumeric = (val) => /^[0-9]+$/.test(val);
+
+    if (type === "select") {
+        if (trimmed === "" || trimmed === "0") {
+            alert(`${label}을(를) 선택해 주세요.`);
+            return false;
+        }
+    } else {
+        if (trimmed === "") {
+            alert(`${label}을(를) 입력해 주세요.`);
+            return false;
+        }
+
+        if (type === "num") {
+            const numericValue = trimmed.replace(/\./g, "").replace(/,/g, "");
+            if (!onlyNumeric(numericValue)) {
+                alert(`${label}은(는) 숫자만 입력해 주세요.`);
+                return false;
+            }
+        }
+    }
+
+    return true;
+};

@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { userLogout } from 'store/authUser';
+
 // import 'common/css/jquery-ui.css';
 import 'common/css/layout.css';
 import 'common/css/sub.css';
 
-import { useState } from "react";
 
 function Header() {
     // const movePage = useNavigate();
@@ -19,6 +22,20 @@ function Header() {
     const loginToggle = () => {
         setLoginOpen(prev => !prev);
     };
+
+    /******************************************* */
+
+    // Redux에서 로그인된 관리자 정보 가져오기
+    const adminUser = useSelector(state => state.authUser);
+    console.log('Header adminUser >>> ', adminUser);
+    const dispatch = useDispatch();
+
+    const logOut = () => {
+        dispatch(userLogout());
+        localStorage.clear();
+        window.location.href = '/';
+    };
+    
 
     return (
         <>
@@ -99,7 +116,7 @@ function Header() {
                     <div className="user">
                         <a href="#user" onClick={loginToggle}>
                             <img
-                                src="/images/profile/s_profile_01.png"
+                                src={`/images/profile/s_profile_${adminUser._c_logImgNum < 10 ? "0" : ""}${adminUser._c_logImgNum}.png`}
                                 id="userCharacterS"
                                 alt="userImg"
                                 onError={(e) =>
@@ -108,16 +125,16 @@ function Header() {
                                 }
                             />
                             <span>
-                                <span id="logNM" className="colWhite">&nbsp;</span>
+                                <span id="logNM" className="colWhite">{adminUser._c_logNm}</span>
                                 <br />
-                                <span id="logDept" className="colGray3 ftSize12">&nbsp;</span>
+                                <span id="logDept" className="colGray3 ftSize12">{adminUser._c_logDept}</span>
                             </span>
                         </a>
                     </div>
                 </div>
                 {loginOpen && (
                     <div id="popUserInfo" className="shadowBox">
-                        <a href="#popclose" className="btn-layerClose">
+                        <a href="#popclose" className="btn-layerClose" onClick={loginToggle}>
                             <img
                                 src="/images/btn/btn_popclose.png"
                                 alt="닫기"
@@ -126,7 +143,7 @@ function Header() {
 
                         <div className="popInfoTop">
                             <img
-                                src="/images/common/no_Image.jpg"
+                                src={`/images/profile/b_profile_${adminUser._c_logImgNum < 10 ? "0" : ""}${adminUser._c_logImgNum}.png`}
                                 alt="유저"
                                 id="userCharacter"
                                 onError={(e) =>
@@ -135,8 +152,8 @@ function Header() {
                                 }
                             />
                             <p id="userName">
-                                <span id="popLogNm" className="ftBold ftSize18 mgB5"></span>
-                                <span id="popLogDept" className="colGray2"></span>
+                                <span id="popLogNm" className="ftBold ftSize18 mgB5">{adminUser._c_logNm}</span>
+                                <span id="popLogDept" className="colGray2">{adminUser._c_logDept}</span>
                             </p>
                         </div>
 
@@ -144,7 +161,7 @@ function Header() {
                             <div id="popMyInfo">
                                 <ul>
                                     <li>
-                                        <a href="/login/logout" className="colRed">
+                                        <a href="#" className="colRed" onClick={logOut}>
                                             <img src="/images/icon/ic_logout.png" alt="로그아웃" />
                                             &nbsp;로그아웃
                                         </a>
