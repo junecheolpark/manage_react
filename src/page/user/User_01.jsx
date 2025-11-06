@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
+import { fnCodeSelList } from 'common/js/function';
 
 import style from './css/user_01.module.css';
 
@@ -68,6 +69,23 @@ const User_01 = () => {
     }, []);
     /*************************************** */
 
+    const [userStatus, setUserStatus] = useState([]);
+    const [userType, setUserType] = useState([]);
+    const [searchType, setSearchType] = useState([]);
+
+    useEffect(() => {
+        async function loadCodes() {
+            const selUserSts = await fnCodeSelList([1, 16, "", "선택", 0, true, 0]);
+            const selSchUserTp = await fnCodeSelList([1, 30, "", "구분", 0, true, 0]);
+            const selUserTp = await fnCodeSelList([1, 30, "", "선택", 0, true, 0]);
+
+            setUserStatus(selUserSts);
+            setSearchType(selSchUserTp);
+            setUserType(selUserTp);
+        }
+        loadCodes();
+    }, []);
+
     const [birth, setBirth] = useState(null);
     const [joinDate, setJoinDate] = useState(null);
     return (
@@ -77,7 +95,11 @@ const User_01 = () => {
                     총 <span id="totalCnt" className="colBlue">0</span>건
                 </p>
                 <select id="selSchUserTp" style={{ width: "120px" }}>
-                    <option value="0">구분</option>
+                    {searchType.map((item) => (
+                        <option key={item.value} value={item.value} data-id={item.id}>
+                            {item.label}
+                        </option>
+                    ))}
                 </select>
                 <select id="selSchUserSts" style={{ width: "120px" }}>
                     <option value="0">상태</option>
@@ -145,7 +167,11 @@ const User_01 = () => {
                                 </th>
                                 <td>
                                     <select id="selUserTp">
-                                        <option value="0">선택</option>
+                                        {userType.map((item) => (
+                                            <option key={item.value} value={item.value} data-id={item.id}>
+                                                {item.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </td>
                             </tr>
@@ -248,7 +274,11 @@ const User_01 = () => {
                                 </th>
                                 <td>
                                     <select id="selUserSts">
-                                        <option value="0">선택</option>
+                                        {userStatus.map((item) => (
+                                            <option key={item.value} value={item.value} data-id={item.id}>
+                                                {item.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </td>
                                 <th>권한</th>

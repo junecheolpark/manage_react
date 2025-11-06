@@ -1,3 +1,5 @@
+import { api } from "api/api";
+
 /**
  * 레이어 팝업 열기/닫기 제어
  * @param {string} id - 팝업 ID
@@ -101,4 +103,49 @@ export const fnAlertReturn = (value, label, type) => {
     }
 
     return true;
+};
+
+/**
+ * 코드 목록
+ * 0 : 목록 구분 - 1:숫자형, 2:문자형
+ * 1 : 상위 idx
+ * 2 : 상위 id
+ * 3 : option default text
+ * 4 : option default value
+ * 5 : option default show/hide
+ * 6 : selected value
+ */
+export const fnCodeSelList = async (arr) => {
+  const [_, pidx, cid, placeholder, defaultVal] = arr;
+
+  const paramMap = { pidx, cid, cnm: "" };
+  
+
+  try {
+    const res = await api.post("/common/codeSelList", paramMap);
+
+    const regData = res.data;
+    console.log("regData:", regData);
+    let options = [];
+
+    // 기본 option
+    options.push({ value: defaultVal, id: "", label: placeholder });
+
+    if (regData.length === 0) {
+      options.push({ value: defaultVal, id: "", label: "no data" });
+    } else {
+      regData.forEach((val) => {
+        options.push({
+          value: val.code_IDX,
+          id: val.code_ID,
+          label: val.code_NM,
+        });
+      });
+    }
+
+    return options;
+  } catch (err) {
+    console.error("Error:", err);
+    return [{ value: defaultVal, id: "", label: "Error!" }];
+  }
 };
