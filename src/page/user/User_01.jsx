@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { api } from "api/api";
+import { useSelector } from "react-redux";
+
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
@@ -7,7 +10,9 @@ import { fnCodeSelList } from 'common/js/function';
 import style from './css/user_01.module.css';
 
 const User_01 = () => {
-    /*****************주소검색********************** */
+    const adminUser = useSelector(state => state.authUser);
+
+    //***************** 주소 검색 ********************** */
     const layerRef = useRef(null);
 
     const fnAddrSchClose = () => {
@@ -67,57 +72,232 @@ const User_01 = () => {
         script.async = true;
         document.body.appendChild(script);
     }, []);
-    /*************************************** */
 
-    const [userStatus, setUserStatus] = useState([]);
-    const [userType, setUserType] = useState([]);
-    const [searchType, setSearchType] = useState([]);
+     const [birth, setBirth] = useState(null);
+    const [joinDate, setJoinDate] = useState(null);
+    /*************************************** */
+    // 공통코드 셀렉트박스 셋팅
+
+    const [selPosi, setSelPosi] = useState([]);
+    const [selDept, setSelDept] = useState([]);
+    const [selSchUserSts, setSelSchUserSts] = useState([]);
+    const [selUserSts, setSelUserSts] = useState([]);
+    const [selUserTp, setSelUserTp] = useState([]);
+    const [selSchUserTp, setSelSchUserTp] = useState([]);
 
     useEffect(() => {
         async function loadCodes() {
-            const selUserSts = await fnCodeSelList([1, 16, "", "선택", 0, true, 0]);
-            const selSchUserTp = await fnCodeSelList([1, 30, "", "구분", 0, true, 0]);
-            const selUserTp = await fnCodeSelList([1, 30, "", "선택", 0, true, 0]);
+            const userSelPosi = await fnCodeSelList([1, 10, '', '선택', 0, true, 0]);
+            const userSelDept = await fnCodeSelList([1, 14, '', '선택', 0, true, 0]);
+            const userSelSchUserSts = await fnCodeSelList([1, 16, '', '상태', 0, true, 0]);
+            const userSelUserSts = await fnCodeSelList([1, 16, "", "선택", 0, true, 0]);
+            const userSelUserTp = await fnCodeSelList([1, 30, "", "선택", 0, true, 0]);
+            const userSelSchUserTp = await fnCodeSelList([1, 30, "", "구분", 0, true, 0]);
 
-            setUserStatus(selUserSts);
-            setSearchType(selSchUserTp);
-            setUserType(selUserTp);
+            setSelPosi(userSelPosi);
+            setSelDept(userSelDept);
+            setSelSchUserSts(userSelSchUserSts);
+            setSelUserSts(userSelUserSts);
+            setSelUserTp(userSelUserTp);
+            setSelSchUserTp(userSelSchUserTp);
         }
         loadCodes();
     }, []);
 
-    const [birth, setBirth] = useState(null);
-    const [joinDate, setJoinDate] = useState(null);
+    /*************************************** */
+    // 사용사 리스트 불러오기
+    const [curPage, setCurPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [totalCnt, setTotalCnt] = useState(0);
+    const [userList, setUserList] = useState([]);
+
+    const [search, setSearch] = useState({
+        usertp: 0,
+        usersts: 0,
+        admintp: 0,
+        schsel: 1,
+        schtxt: "",
+    });
+
+    // 카운트 가져오기
+    const fnSortListView = async () => {
+        const params = {
+            ltype: 1,
+            page: curPage,
+            psize: pageSize,
+            usertp: parseInt(search.usertp),
+            usersts: parseInt(search.usersts),
+            admintp: parseInt(search.admintp),
+            cidx: 0,
+            cnm: "",
+            datetp: 0,
+            sdate: "",
+            edate: "",
+            schsel: parseInt(search.schsel),
+            schtxt: search.schtxt,
+            orderby: 0,
+            desc: 0,
+        };
+
+        try {
+            const res = await api.get("/user/listTotal", { params }); 
+            const total = res.data;
+
+            // console.log("총 개수:", total);
+            setTotalCnt(total);
+
+            fnSortList(total, params); // 기존 함수 호출
+        } catch (err) {
+            console.error("요청 실패:", err);
+            alert("불러오기 실패");
+        } 
+    };
+    // 목록 가져오기
+    const fnSortList = async (total, paramMap ) => {
+        const params = { ...paramMap, ltype: 2 };
+        try {
+            const res = await api.get("/user/list", { params });
+            const items = res.data;
+
+            if (!items || items.length === 0) {
+                setUserList([]);
+            } else {
+                setUserList(items);
+            }
+        } catch (err) {
+            alert("목록 불러오기 실패");
+            console.error(err);
+        }
+    };
+
+    // 엔터키 처리
+    const enterKey = (e) => {
+        if (e.keyCode === 13) {
+            setCurPage(1);
+            fnSortListView();
+        }
+    };
+
+    // 검색 조건 변경 처리
+    const searchChange = (e) => {
+        const { name, value } = e.target;
+        setSearch((prev) => ({ ...prev, [name]: value }));
+    };
+
+    useEffect(() => {
+        fnSortListView();
+    }, []);
+
+    const [userView, setUserView] = useState({
+        user_IDX: 0,
+        nm: "",
+        user_ID: "",
+        user_PW: "",
+        phone: "",
+        mobile: "",
+        email: "",
+        zipcode: "",
+        addr: "",
+        addr_DETAIL: "",
+        admin_TP: 0,
+        birthday: "",
+        company_IDX: 0,
+        company_NM: "",
+        dept_IDX: 0,
+        posi_IDX: 0,
+        join_DATE: "",
+        user_STS: 0,
+        user_TP: 0,
+        emailId: "",
+        emailDomain: "",
+    });
+    const [isEditable, setIsEditable] = useState(false); // 수정버튼 활성화 여부
+
+    // 사용자 상세 보기
+    const fnUserView = async (uidx) => {
+
+        const params = {
+            uidx: uidx,
+        };
+        try {
+            const res = await api.get("/user/view", { params });
+            console.log(res)
+            const resData = res.data;
+
+            const emailParts = (resData.email || "@").split("@");
+            const [emailId, emailDomain] = emailParts;
+
+            setUserView({
+                ...userView,     // 기존 폼값 유지
+                ...resData,    // 서버 응답 덮어쓰기
+                emailId,
+                emailDomain,
+            });
+
+            setIsEditable(resData.user_IDX === adminUser._c_logIdx);
+        } catch (err) {
+            alert("목록 불러오기 실패");
+            console.error(err);
+        }
+        // alert(`사용자 상세 보기: ${uidx}`);
+    }
+
+    const userViewChange = (e) => {
+        const { name, value } = e.target;
+        setUserView((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    /*************************************** */
+
+
+
+
+
     return (
         <section className="contens">
             <section className="schBox">
                 <p>
-                    총 <span id="totalCnt" className="colBlue">0</span>건
+                    총 <span id="totalCnt" className="colBlue">{totalCnt}</span>건
                 </p>
-                <select id="selSchUserTp" style={{ width: "120px" }}>
-                    {searchType.map((item) => (
+                <select name="usertp" style={{ width: "120px" }} value={search.usertp} onChange={searchChange}>
+                    {selSchUserTp.map((item) => (
                         <option key={item.value} value={item.value} data-id={item.id}>
                             {item.label}
                         </option>
                     ))}
                 </select>
-                <select id="selSchUserSts" style={{ width: "120px" }}>
-                    <option value="0">상태</option>
+                <select name="usersts" style={{ width: "120px" }} value={search.usersts} onChange={searchChange}>
+                    {selSchUserSts.map((item) => (
+                        <option key={item.value} value={item.value} data-id={item.id}>
+                            {item.label}
+                        </option>
+                    ))}
                 </select>
-                <select id="selSch" style={{ width: "120px" }}>
+                <select name="schsel" style={{ width: "120px" }} value={search.schsel} onChange={searchChange}>
                     <option value="1">성명</option>
                     <option value="2">사번(ID)</option>
                     <option value="3">연락처</option>
                     <option value="4">이메일</option>
                 </select>
-                <input type="text" id="txtSch" style={{ width: "200px" }} />
-                <input type="submit" id="btnSch" className="btn btnBlue" value="검색" />
+                <input type="text" name="schtxt"  style={{ width: "200px" }} value={search.schtxt} onChange={searchChange} onKeyUp={enterKey} />
+                <input type="submit" id="btnSch" className="btn btnBlue" value="검색"  />
             </section>
 
             <section className={style.userManagement}>
                 <section className="shadowBox">
                     <section className="tableBody">
                         <table id="userList" className="tableList">
+                            <colgroup>
+                                <col />
+                                <col style={{ width: "12%" }} />
+                                <col style={{ width: "12%" }} />
+                                <col style={{ width: "14%" }} />
+                                <col style={{ width: "17%" }} />
+                                <col style={{ width: "15%" }} />
+                            </colgroup>
                             <thead>
                                 <tr>
                                     <th>회사</th>
@@ -129,11 +309,38 @@ const User_01 = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colSpan="6" className="noData">
-                                        검색된 사용자가 없습니다.
-                                    </td>
-                                </tr>
+                                {userList.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="noData">
+                                            검색된 사용자가 없습니다.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    userList.map((user) => (
+                                        <tr
+                                            key={user.user_IDX}
+                                            data-uidx={user.user_IDX}
+                                            data-cidx={user.company_IDX || 0}
+                                            onClick={() => fnUserView(user.user_IDX)} // 클릭 시 상세 보기
+                                            className={user.user_STS === 18 ? "colRed" : ""}
+                                        >
+                                            <td>
+                                                <p className="text-ellipsis" title={user.company_NM}>
+                                                    {user.company_NM || "-"}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p className="text-ellipsis" title={user.nm}>
+                                                    {user.nm || "-"}
+                                                </p>
+                                            </td>
+                                            <td>{user.posi_NM || "-"}</td>
+                                            <td>{user.user_ID}</td>
+                                            <td>{user.mobile || user.phone || "-"}</td>
+                                            <td>{user.user_STS_NM}</td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                         <section className="paging" id="pagingView">
@@ -161,13 +368,13 @@ const User_01 = () => {
                                 <th>
                                     <span className="colRed">*</span> 성명
                                 </th>
-                                <td><input type="text" id="txtNm" data-uidx="0" /></td>
+                                <td><input type="text" name="nm" value={userView.nm || ""} onChange={userViewChange} /></td>
                                 <th>
                                     <span className="colRed">*</span> 구분
                                 </th>
                                 <td>
                                     <select id="selUserTp">
-                                        {userType.map((item) => (
+                                        {selUserTp.map((item) => (
                                             <option key={item.value} value={item.value} data-id={item.id}>
                                                 {item.label}
                                             </option>
@@ -179,13 +386,21 @@ const User_01 = () => {
                                 <th>부서</th>
                                 <td>
                                     <select id="selDept">
-                                        <option value="0">선택</option>
+                                        {selDept.map((item) => (
+                                            <option key={item.value} value={item.value} data-id={item.id}>
+                                                {item.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </td>
                                 <th>직위</th>
                                 <td>
                                     <select id="selPosi">
-                                        <option value="0">선택</option>
+                                        {selPosi.map((item) => (
+                                            <option key={item.value} value={item.value} data-id={item.id}>
+                                                {item.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </td>
                             </tr>
@@ -193,17 +408,17 @@ const User_01 = () => {
                                 <th>
                                     <span className="colRed">*</span> 아이디
                                 </th>
-                                <td><input type="text" id="txtID" /></td>
+                                <td><input type="text"  name="user_ID" value={userView.user_ID || ""} onChange={userViewChange} /></td>
                                 <th>
                                     <span className="colRed" id="pwRequired">*</span> 비밀번호
                                 </th>
-                                <td><input type="password" id="txtPW" /></td>
+                                <td><input type="password" name="user_PW"  onChange={userViewChange}/></td>
                             </tr>
                             <tr>
                                 <th>일반전화</th>
-                                <td><input type="text" id="txtPhone" placeholder="숫자만 입력" /></td>
+                                <td><input type="text" name="phone" placeholder="숫자만 입력" value={userView.phone || ""} onChange={userViewChange}/></td>
                                 <th>휴대전화</th>
-                                <td><input type="text" id="txtMobile" placeholder="숫자만 입력" /></td>
+                                <td><input type="text" name="mobile" placeholder="숫자만 입력" value={userView.mobile || ""} onChange={userViewChange}/></td>
                             </tr>
                             <tr>
                                 <th>
@@ -239,6 +454,7 @@ const User_01 = () => {
                                         locale={ko}
                                         placeholderText="날짜 선택"
                                         className="cal"
+                                        value={userView.birthday || ""}
                                     />
                                 </td>
                                 <th>입사일자</th>
@@ -250,6 +466,7 @@ const User_01 = () => {
                                         locale={ko}
                                         placeholderText="날짜 선택"
                                         className="cal"
+                                        value={userView.join_DATE || ""}
                                     />
                                 </td>
                             </tr>
@@ -258,11 +475,11 @@ const User_01 = () => {
                                 <td colSpan="3">
                                     <div className="ucTable">
                                         <div style={{ width: "170px", paddingRight: "5px" }}>
-                                            <input type="text" id="txtEmail" />
+                                            <input type="text" name="emailId" value={userView.emailId || ""} onChange={userViewChange}/>
                                         </div>
                                         <div style={{ width: "20px", paddingRight: "5px" }}>@</div>
                                         <div style={{ minWidth: "200px" }}>
-                                            <input type="text" id="txtEmailDm" placeholder="이메일 검색 후 선택" />
+                                            <input type="text" name="emailDomain" placeholder="이메일 검색 후 선택" value={userView.emailDomain || ""} onChange={userViewChange} />
                                             <div id="emailSchResult"></div>
                                         </div>
                                     </div>
@@ -274,7 +491,7 @@ const User_01 = () => {
                                 </th>
                                 <td>
                                     <select id="selUserSts">
-                                        {userStatus.map((item) => (
+                                        {selUserSts.map((item) => (
                                             <option key={item.value} value={item.value} data-id={item.id}>
                                                 {item.label}
                                             </option>

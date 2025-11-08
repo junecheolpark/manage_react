@@ -42,10 +42,10 @@ const Login = () => {
         };
 
         const res = await api.post("/login/login", paramMap);
-        const regData = res.data;
+        const resData = res.data;
 
 
-        if (regData === 0) {
+        if (resData === 0) {
             const rtn = await api.post(`login/loginCok`, {});
             const rntData = rtn.data;
             const userInfo = {
@@ -71,6 +71,7 @@ const Login = () => {
         }
     };
 
+    // 엔터키 처리
     const enterKey = (e) => {
         if (e.keyCode === 13) {
             loginProc();

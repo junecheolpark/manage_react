@@ -118,14 +118,15 @@ export const fnAlertReturn = (value, label, type) => {
 export const fnCodeSelList = async (arr) => {
   const [_, pidx, cid, placeholder, defaultVal] = arr;
 
-  const paramMap = { pidx, cid, cnm: "" };
-  
+    const paramMap = {
+        params: { pidx: pidx, cid: cid, cnm: "" },
+    };
+
 
   try {
-    const res = await api.post("/common/codeSelList", paramMap);
+    const res = await api.get("/common/codeSelList", paramMap);
 
     const regData = res.data;
-    console.log("regData:", regData);
     let options = [];
 
     // 기본 option

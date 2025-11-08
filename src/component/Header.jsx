@@ -27,7 +27,6 @@ function Header() {
 
     // Redux에서 로그인된 관리자 정보 가져오기
     const adminUser = useSelector(state => state.authUser);
-    console.log('Header adminUser >>> ', adminUser);
     const dispatch = useDispatch();
 
     const logOut = () => {
