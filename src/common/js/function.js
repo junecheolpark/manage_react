@@ -150,3 +150,16 @@ export const fnCodeSelList = async (arr) => {
     return [{ value: defaultVal, id: "", label: "Error!" }];
   }
 };
+
+// 값이 0이나 공백일 경우 '-' 반환
+export const fnBlank = (pVal, pReverse) => {
+  const val = (pVal ?? "").toString().trim(); // null, undefined 방지 + 문자열 변환
+
+  if (!pReverse) {
+    if (val === "" || val === "0") return "-";
+  } else {
+    if (val === "-") return "";
+  }
+
+  return val;
+};

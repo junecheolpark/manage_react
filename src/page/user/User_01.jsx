@@ -5,75 +5,13 @@ import { useSelector } from "react-redux";
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
-import { fnCodeSelList } from 'common/js/function';
+import { fnCodeSelList, fnBlank } from 'common/js/function';
 
 import style from './css/user_01.module.css';
 
 const User_01 = () => {
     const adminUser = useSelector(state => state.authUser);
 
-    //***************** 주소 검색 ********************** */
-    const layerRef = useRef(null);
-
-    const fnAddrSchClose = () => {
-        if (layerRef.current) layerRef.current.style.display = "none";
-    };
-
-    const fnAddrSch = () => {
-        new window.daum.Postcode({
-            oncomplete: function (data) {
-                let addr = "";
-                let extraAddr = "";
-
-                if (data.userSelectedType === "R") addr = data.roadAddress;
-                else addr = data.jibunAddress;
-
-                if (data.userSelectedType === "R") {
-                    if (data.bname && /[동|로|가]$/g.test(data.bname)) extraAddr += data.bname;
-                    if (data.buildingName && data.apartment === "Y")
-                        extraAddr += (extraAddr ? ", " + data.buildingName : data.buildingName);
-                    if (extraAddr) extraAddr = " (" + extraAddr + ")";
-                }
-
-                document.getElementById("txtZipCd").value = data.zonecode;
-                document.getElementById("txtAddr").value = addr + extraAddr;
-                document.getElementById("txtAddrDetail").focus();
-
-                if (layerRef.current) layerRef.current.style.display = "none";
-            },
-            width: "100%",
-            height: "100%",
-            maxSuggestItems: 5,
-        }).embed(layerRef.current);
-
-        if (layerRef.current) {
-            layerRef.current.style.display = "block";
-            initLayerPosition();
-        }
-    };
-
-    const initLayerPosition = () => {
-        if (!layerRef.current) return;
-        const width = 300;
-        const height = 400;
-        const borderWidth = 2;
-        layerRef.current.style.width = width + "px";
-        layerRef.current.style.height = height + "px";
-        layerRef.current.style.border = borderWidth + "px solid";
-        layerRef.current.style.left =
-            ((window.innerWidth - width) / 2 - borderWidth) + "px";
-        layerRef.current.style.top =
-            ((window.innerHeight - height) / 2 - borderWidth) + "px";
-    };
-
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-        script.async = true;
-        document.body.appendChild(script);
-    }, []);
-
-    /*************************************** */
     // 공통코드 셀렉트박스 셋팅
 
     const [selPosi, setSelPosi] = useState([]);
@@ -186,7 +124,7 @@ const User_01 = () => {
         fnSortListView();
     }, []);
 
-    const [userView, setUserView] = useState({
+    const defaultUserView = {
         user_IDX: 0,
         nm: "",
         user_ID: "",
@@ -208,18 +146,21 @@ const User_01 = () => {
         user_TP: 0,
         emailId: "",
         emailDomain: "",
-    });
+        admin_NM: "",
+    };
+
+    const [userView, setUserView] = useState(defaultUserView);
+    const [selUser, setSelUser] = useState(0); // 클릭 셀 활성화 여부
     const [isEditable, setIsEditable] = useState(false); // 수정버튼 활성화 여부
 
     // 사용자 상세 보기
     const fnUserView = async (uidx) => {
-
         const params = {
             uidx: uidx,
         };
         try {
             const res = await api.get("/user/view", { params });
-            console.log(res)
+            // console.log(res)
             const resData = res.data;
 
             const emailParts = (resData.email || "@").split("@");
@@ -232,6 +173,7 @@ const User_01 = () => {
                 emailDomain,
             });
 
+            setSelUser(uidx); // 선택된 셀
             setIsEditable(resData.user_IDX === adminUser._c_logIdx);
         } catch (err) {
             alert("목록 불러오기 실패");
@@ -239,23 +181,86 @@ const User_01 = () => {
         }
         // alert(`사용자 상세 보기: ${uidx}`);
     }
-
+    
+    // 취소 버튼 클릭시 데이터 초기화
+    const fnUserCancel = () => {
+        setUserView(defaultUserView);
+        setSelUser(0);
+    }
+    
     const userViewChange = (e) => {
-        console.log(e);
-        if (name === "birthday" || name === "join_DATE") {
-            const { name, value } = e;
-        }else{
-            const { name, value } = e.target;
-        }
+        const { name, value } = e.target;
         setUserView((prev) => ({
             ...prev,
             [name]: value,
         }));
     };
 
+    //***************** 주소 검색 ********************** */
+    const layerRef = useRef(null);
+    
+    const fnAddrSchClose = () => {
+        if (layerRef.current) layerRef.current.style.display = "none";
+    };
+
+    const fnAddrSch = () => {
+        new window.daum.Postcode({
+            oncomplete: function (data) {
+                let addr = "";
+                let extraAddr = "";
+
+                if (data.userSelectedType === "R") addr = data.roadAddress;
+                else addr = data.jibunAddress;
+
+                if (data.userSelectedType === "R") {
+                    if (data.bname && /[동|로|가]$/g.test(data.bname)) extraAddr += data.bname;
+                    if (data.buildingName && data.apartment === "Y")
+                        extraAddr += (extraAddr ? ", " + data.buildingName : data.buildingName);
+                    if (extraAddr) extraAddr = " (" + extraAddr + ")";
+                }
+
+                setUserView((prev) => ({
+                    ...prev,
+                    zipcode: data.zonecode,
+                    addr: addr + extraAddr,
+                }));
+                document.getElementById("txtAddrDetail").focus();
+
+                if (layerRef.current) layerRef.current.style.display = "none";
+            },
+            width: "100%",
+            height: "100%",
+            maxSuggestItems: 5,
+        }).embed(layerRef.current);
+
+        if (layerRef.current) {
+            layerRef.current.style.display = "block";
+            initLayerPosition();
+        }
+    };
+
+    const initLayerPosition = () => {
+        if (!layerRef.current) return;
+        const width = 300;
+        const height = 400;
+        const borderWidth = 2;
+        layerRef.current.style.width = width + "px";
+        layerRef.current.style.height = height + "px";
+        layerRef.current.style.border = borderWidth + "px solid";
+        layerRef.current.style.left =
+            ((window.innerWidth - width) / 2 - borderWidth) + "px";
+        layerRef.current.style.top =
+            ((window.innerHeight - height) / 2 - borderWidth) + "px";
+    };
+
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
+
     /*************************************** */
-
-
 
 
 
@@ -285,8 +290,8 @@ const User_01 = () => {
                     <option value="3">연락처</option>
                     <option value="4">이메일</option>
                 </select>
-                <input type="text" name="schtxt"  style={{ width: "200px" }} value={search.schtxt} onChange={searchChange} onKeyUp={enterKey} />
-                <input type="submit" id="btnSch" className="btn btnBlue" value="검색"  />
+                <input type="text" name="schtxt" style={{ width: "200px" }} value={search.schtxt} onChange={searchChange} onKeyUp={enterKey} />
+                <input type="submit" id="btnSch" className="btn btnBlue" value="검색" onClick={fnSortListView} />
             </section>
 
             <section className={style.userManagement}>
@@ -325,7 +330,8 @@ const User_01 = () => {
                                             data-uidx={user.user_IDX}
                                             data-cidx={user.company_IDX || 0}
                                             onClick={() => fnUserView(user.user_IDX)} // 클릭 시 상세 보기
-                                            className={user.user_STS === 18 ? "colRed" : ""}
+                                            className={`${user.user_STS === 18 ? "colRed" : ""} 
+                                            ${selUser === user.user_IDX ? "selRow" : ""}`}
                                         >
                                             <td>
                                                 <p className="text-ellipsis" title={user.company_NM}>
@@ -442,7 +448,7 @@ const User_01 = () => {
                                             <input type="text" name="addr" value={userView.addr || ""} onChange={userViewChange} readOnly />
                                         </div>
                                         <div>
-                                            <input type="text" name="addr_DETAIL" value={userView.addr_DETAIL || ""} onChange={userViewChange} />
+                                            <input type="text" id="txtAddrDetail" name="addr_DETAIL" value={userView.addr_DETAIL || ""} onChange={userViewChange} />
                                         </div>
                                     </div>
                                 </td>
@@ -452,8 +458,12 @@ const User_01 = () => {
                                 <td>
                                     <DatePicker
                                         selected={userView.birthday}
-                                        name="birthday"
-                                        onChange={(date) => userViewChange(date)}
+                                        onChange={(date) =>
+                                            setUserView((prev) => ({
+                                                ...prev,
+                                                birthday: date,
+                                            }))
+                                        }
                                         dateFormat="yyyy-MM-dd"
                                         locale={ko}
                                         placeholderText="날짜 선택"
@@ -465,8 +475,12 @@ const User_01 = () => {
                                 <td>
                                     <DatePicker
                                         selected={userView.join_DATE}
-                                        name="join_DATE"
-                                        onChange={(date) => userViewChange(date)}
+                                        onChange={(date) =>
+                                            setUserView((prev) => ({
+                                                ...prev,
+                                                join_DATE: date,
+                                            }))
+                                        }
                                         dateFormat="yyyy-MM-dd"
                                         locale={ko}
                                         placeholderText="날짜 선택"
@@ -505,7 +519,7 @@ const User_01 = () => {
                                 </td>
                                 <th>권한</th>
                                 <td>
-                                    <span id="lblAdTpNm" data-atp="0">-</span>
+                                    <span >{fnBlank(userView.admin_NM)}</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -513,7 +527,7 @@ const User_01 = () => {
                     <div className="btnRight pdT10">
                         <a href="#reg" className="btn btnBlue" id="btnInput">등록</a>
                         <a href="#del" className="btn btnRed" className={style.btnDelete}>삭제</a>
-                        <a href="#can" className="btn btnWhite">취소</a>
+                        <a href="#can" className="btn btnWhite" onClick={fnUserCancel}>취소</a>
                     </div>
                 </section>
             </section>
