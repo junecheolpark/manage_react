@@ -73,8 +73,6 @@ const User_01 = () => {
         document.body.appendChild(script);
     }, []);
 
-     const [birth, setBirth] = useState(null);
-    const [joinDate, setJoinDate] = useState(null);
     /*************************************** */
     // 공통코드 셀렉트박스 셋팅
 
@@ -243,7 +241,12 @@ const User_01 = () => {
     }
 
     const userViewChange = (e) => {
-        const { name, value } = e.target;
+        console.log(e);
+        if (name === "birthday" || name === "join_DATE") {
+            const { name, value } = e;
+        }else{
+            const { name, value } = e.target;
+        }
         setUserView((prev) => ({
             ...prev,
             [name]: value,
@@ -373,7 +376,7 @@ const User_01 = () => {
                                     <span className="colRed">*</span> 구분
                                 </th>
                                 <td>
-                                    <select id="selUserTp">
+                                    <select name="user_TP" value={userView.user_TP || 0} onChange={userViewChange}>
                                         {selUserTp.map((item) => (
                                             <option key={item.value} value={item.value} data-id={item.id}>
                                                 {item.label}
@@ -385,7 +388,7 @@ const User_01 = () => {
                             <tr>
                                 <th>부서</th>
                                 <td>
-                                    <select id="selDept">
+                                    <select name="dept_IDX" value={userView.dept_IDX || 0} onChange={userViewChange}>
                                         {selDept.map((item) => (
                                             <option key={item.value} value={item.value} data-id={item.id}>
                                                 {item.label}
@@ -395,7 +398,7 @@ const User_01 = () => {
                                 </td>
                                 <th>직위</th>
                                 <td>
-                                    <select id="selPosi">
+                                    <select name="posi_IDX" value={userView.posi_IDX || 0} onChange={userViewChange}>
                                         {selPosi.map((item) => (
                                             <option key={item.value} value={item.value} data-id={item.id}>
                                                 {item.label}
@@ -433,13 +436,13 @@ const User_01 = () => {
                                 <td colSpan="3">
                                     <div className="ucTable">
                                         <div style={{ width: "70px", paddingRight: "5px" }}>
-                                            <input type="text" id="txtZipCd" readOnly />
+                                            <input type="text" name="zipcode" value={userView.zipcode || ""} onChange={userViewChange} readOnly  />
                                         </div>
                                         <div style={{ width: "40%", paddingRight: "5px" }}>
-                                            <input type="text" id="txtAddr" readOnly />
+                                            <input type="text" name="addr" value={userView.addr || ""} onChange={userViewChange} readOnly />
                                         </div>
                                         <div>
-                                            <input type="text" id="txtAddrDetail" />
+                                            <input type="text" name="addr_DETAIL" value={userView.addr_DETAIL || ""} onChange={userViewChange} />
                                         </div>
                                     </div>
                                 </td>
@@ -448,8 +451,9 @@ const User_01 = () => {
                                 <th>생년월일</th>
                                 <td>
                                     <DatePicker
-                                        selected={birth}
-                                        onChange={(date) => setBirth(date)}
+                                        selected={userView.birthday}
+                                        name="birthday"
+                                        onChange={(date) => userViewChange(date)}
                                         dateFormat="yyyy-MM-dd"
                                         locale={ko}
                                         placeholderText="날짜 선택"
@@ -460,8 +464,9 @@ const User_01 = () => {
                                 <th>입사일자</th>
                                 <td>
                                     <DatePicker
-                                        selected={joinDate}
-                                        onChange={(date) => setJoinDate(date)}
+                                        selected={userView.join_DATE}
+                                        name="join_DATE"
+                                        onChange={(date) => userViewChange(date)}
                                         dateFormat="yyyy-MM-dd"
                                         locale={ko}
                                         placeholderText="날짜 선택"
@@ -490,7 +495,7 @@ const User_01 = () => {
                                     <span className="colRed">*</span> 상태
                                 </th>
                                 <td>
-                                    <select id="selUserSts">
+                                    <select name="user_STS" value={userView.user_STS || 0} onChange={userViewChange}>
                                         {selUserSts.map((item) => (
                                             <option key={item.value} value={item.value} data-id={item.id}>
                                                 {item.label}
