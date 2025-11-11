@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { api } from "api/api";
 import { useSelector } from "react-redux";
+import { fnCodeSelList, fnBlank, fnAlertReturn } from 'common/js/function';
+import Pagination from 'component/Pagination';
 
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
-import { fnCodeSelList, fnBlank } from 'common/js/function';
 
 import style from './css/user_01.module.css';
 
@@ -41,10 +42,12 @@ const User_01 = () => {
     }, []);
 
     /*************************************** */
-    // 사용사 리스트 불러오기
-    const [curPage, setCurPage] = useState(1);
-    const [pageSize] = useState(10);
-    const [totalCnt, setTotalCnt] = useState(0);
+     // 페이지네이션
+     const [curPage, setCurPage] = useState(1); // 현재페이지
+     const [pageSize] = useState(5); // 페이지에 표시할 행 개수
+     const [totalCnt, setTotalCnt] = useState(0); // 총개수
+     /****************************************************/
+     // 사용사 리스트 불러오기
     const [userList, setUserList] = useState([]);
 
     const [search, setSearch] = useState({
@@ -74,9 +77,8 @@ const User_01 = () => {
             orderby: 0,
             desc: 0,
         };
-
         try {
-            const res = await api.get("/user/listTotal", { params }); 
+            const res = await api.get("/user/listTotal", { params });
             const total = res.data;
 
             // console.log("총 개수:", total);
@@ -86,10 +88,10 @@ const User_01 = () => {
         } catch (err) {
             console.error("요청 실패:", err);
             alert("불러오기 실패");
-        } 
+        }
     };
     // 목록 가져오기
-    const fnSortList = async (total, paramMap ) => {
+    const fnSortList = async (total, paramMap) => {
         const params = { ...paramMap, ltype: 2 };
         try {
             const res = await api.get("/user/list", { params });
@@ -120,9 +122,11 @@ const User_01 = () => {
         setSearch((prev) => ({ ...prev, [name]: value }));
     };
 
+    // 페이지 변경시 
     useEffect(() => {
+        setCurPage(curPage);
         fnSortListView();
-    }, []);
+    }, [curPage]);
 
     const defaultUserView = {
         user_IDX: 0,
@@ -155,12 +159,13 @@ const User_01 = () => {
 
     // 사용자 상세 보기
     const fnUserView = async (uidx) => {
+        
         const params = {
             uidx: uidx,
         };
         try {
             const res = await api.get("/user/view", { params });
-            // console.log(res)
+             console.log(res)
             const resData = res.data;
 
             const emailParts = (resData.email || "@").split("@");
@@ -174,20 +179,21 @@ const User_01 = () => {
             });
 
             setSelUser(uidx); // 선택된 셀
-            setIsEditable(resData.user_IDX === adminUser._c_logIdx);
+            setIsEditable(resData.user_IDX !== adminUser._c_logIdx);
         } catch (err) {
             alert("목록 불러오기 실패");
             console.error(err);
         }
         // alert(`사용자 상세 보기: ${uidx}`);
     }
-    
+
     // 취소 버튼 클릭시 데이터 초기화
     const fnUserCancel = () => {
         setUserView(defaultUserView);
         setSelUser(0);
+        setIsEditable(false);
     }
-    
+
     const userViewChange = (e) => {
         const { name, value } = e.target;
         setUserView((prev) => ({
@@ -196,9 +202,61 @@ const User_01 = () => {
         }));
     };
 
+    // 회원 등록/수정
+    const fnUserInput = async () => {
+        // --- 유효성 검사 ---
+        if (!fnAlertReturn(userView.nm, "성명", '')) return;
+        if (!fnAlertReturn(userView.user_TP, "구분", 'select')) return;
+        if (!fnAlertReturn(userView.user_ID, "아이디", '')) return;
+        if (selUser === 0 && !fnAlertReturn(userView.user_PW, "비밀번호", '')) return;
+        if (!fnAlertReturn(userView.user_STS, "상태", 'select')) return;
+
+        // --- 파라미터 구성 ---
+        const paramMap = {
+            uidx: selUser,
+            usertp: parseInt(userView.user_TP),
+            id: userView.user_ID,
+            pw: userView.user_PW,
+            nm: userView.nm,
+            pidx: parseInt(userView.posi_IDX),
+            didx: parseInt(userView.dept_IDX),
+            phone: userView.phone,
+            mobile: userView.mobile,
+            email: `${userView.emailId}@${userView.emailDomain}`,
+            zcode: userView.zipcode,
+            addr: userView.addr,
+            addrdt: userView.addr_DETAIL,
+            usersts: parseInt(userView.user_STS),
+            cidx: 12,
+            admintp: parseInt(userView.admin_TP),
+            jdate: userView.join_DATE,
+            ridx: 1, // 로그인 사용자 idx 등
+        };
+
+        try {
+            const res = await api.post("/user/input", paramMap);
+            const result = res.data;
+
+            if (result === 0) {
+                alert("처리되었습니다.");
+                fnUserCancel(); // 입력폼 초기화
+                fnSortListView(); // 목록 갱신
+            } else if (result === 4) {
+                alert("아이디 중복");
+            } else if (result === 5) {
+                alert("사용자 중복");
+            } else {
+                alert("실패");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("요청 실패");
+        }
+    };
+
     //***************** 주소 검색 ********************** */
     const layerRef = useRef(null);
-    
+
     const fnAddrSchClose = () => {
         if (layerRef.current) layerRef.current.style.display = "none";
     };
@@ -352,21 +410,12 @@ const User_01 = () => {
                                 )}
                             </tbody>
                         </table>
-                        <section className="paging" id="pagingView">
-                            <button className="img brNo">
-                                <img src="/images/btn/paging_first_n.gif" alt="first" />
-                            </button>
-                            <button className="img no">
-                                <img src="/images/btn/paging_prev_n.gif" alt="before" />
-                            </button>
-                            <button className="on">1</button>
-                            <button className="img brNo">
-                                <img src="/images/btn/paging_next_n.gif" alt="next" />
-                            </button>
-                            <button className="img">
-                                <img src="/images/btn/paging_last_n.gif" alt="last" />
-                            </button>
-                        </section>
+                        <Pagination
+                            totalCount={totalCnt}
+                            tableLimit={pageSize}
+                            curPage={curPage}
+                            onPageChange={(page) => setCurPage(page)}
+                        />
                     </section>
                 </section>
 
@@ -417,17 +466,17 @@ const User_01 = () => {
                                 <th>
                                     <span className="colRed">*</span> 아이디
                                 </th>
-                                <td><input type="text"  name="user_ID" value={userView.user_ID || ""} onChange={userViewChange} /></td>
+                                <td><input type="text" name="user_ID" value={userView.user_ID || ""} onChange={userViewChange} /></td>
                                 <th>
-                                    <span className="colRed" id="pwRequired">*</span> 비밀번호
+                                    <span className="colRed" id="pwRequired">{selUser === 0 ? "*" : ""}</span> 비밀번호
                                 </th>
-                                <td><input type="password" name="user_PW"  onChange={userViewChange}/></td>
+                                <td><input type="password" name="user_PW" onChange={userViewChange} /></td>
                             </tr>
                             <tr>
                                 <th>일반전화</th>
-                                <td><input type="text" name="phone" placeholder="숫자만 입력" value={userView.phone || ""} onChange={userViewChange}/></td>
+                                <td><input type="text" name="phone" placeholder="숫자만 입력" value={userView.phone || ""} onChange={userViewChange} /></td>
                                 <th>휴대전화</th>
-                                <td><input type="text" name="mobile" placeholder="숫자만 입력" value={userView.mobile || ""} onChange={userViewChange}/></td>
+                                <td><input type="text" name="mobile" placeholder="숫자만 입력" value={userView.mobile || ""} onChange={userViewChange} /></td>
                             </tr>
                             <tr>
                                 <th>
@@ -442,7 +491,7 @@ const User_01 = () => {
                                 <td colSpan="3">
                                     <div className="ucTable">
                                         <div style={{ width: "70px", paddingRight: "5px" }}>
-                                            <input type="text" name="zipcode" value={userView.zipcode || ""} onChange={userViewChange} readOnly  />
+                                            <input type="text" name="zipcode" value={userView.zipcode || ""} onChange={userViewChange} readOnly />
                                         </div>
                                         <div style={{ width: "40%", paddingRight: "5px" }}>
                                             <input type="text" name="addr" value={userView.addr || ""} onChange={userViewChange} readOnly />
@@ -494,7 +543,7 @@ const User_01 = () => {
                                 <td colSpan="3">
                                     <div className="ucTable">
                                         <div style={{ width: "170px", paddingRight: "5px" }}>
-                                            <input type="text" name="emailId" value={userView.emailId || ""} onChange={userViewChange}/>
+                                            <input type="text" name="emailId" value={userView.emailId || ""} onChange={userViewChange} />
                                         </div>
                                         <div style={{ width: "20px", paddingRight: "5px" }}>@</div>
                                         <div style={{ minWidth: "200px" }}>
@@ -525,7 +574,7 @@ const User_01 = () => {
                         </tbody>
                     </table>
                     <div className="btnRight pdT10">
-                        <a href="#reg" className="btn btnBlue" id="btnInput">등록</a>
+                        <a href="#reg" className="btn btnBlue" id="btnInput" onClick={fnUserInput} style={{ display: isEditable ? "none" : "inline-block" }}> {selUser === 0 ? "등록" : "수정"}</a>
                         <a href="#del" className="btn btnRed" className={style.btnDelete}>삭제</a>
                         <a href="#can" className="btn btnWhite" onClick={fnUserCancel}>취소</a>
                     </div>
