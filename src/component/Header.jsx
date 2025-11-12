@@ -38,13 +38,6 @@ function Header() {
 
     return (
         <>
-            <section className="loading-layer">
-                <div className="loadingBg"></div>
-                <div className="loadingImg">
-                    <img src="/images/loading.svg" alt="로딩중..." />
-                </div>
-            </section>
-
             {/* 상단 메뉴 */}
             <section className="topMenu">
                 <div className="logo">

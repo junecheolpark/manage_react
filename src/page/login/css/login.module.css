@@ -13,6 +13,6 @@
 .loginBtn{width:100%; display: block; background-color: #333; color:#fff; font-weight: bold; padding:14px; text-align: center; border-radius: 14px; font-size: 16px;}
         
 /** 로딩중 **/
-.loadingLayer { display: none; position: absolute; top: 0; left: 0; width: 100%;  height: 100%; z-index: 9999; }
+.loadingLayer { position: absolute; top: 0; left: 0; width: 100%;  height: 100%; z-index: 9999; }
 .loadingBg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /* IE 5-7 */ filter: alpha(opacity=50); /* Netscape */ -moz-opacity: 5.0; /* Safari 1.x */ -khtml-opacity: 0.5; /* Good browsers */ opacity: 0.5; }
 .loadingImg { position: absolute; top: 50%;  left: 50%; margin: -50px 0 0 -50px; }        

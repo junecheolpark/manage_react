@@ -29,42 +29,44 @@ const initialState = {
 };
 
 // 리듀서 선언
-export default function counter(state = initialState, action) {
+export default function authUser(state = initialState, action) {
   switch (action.type) {
     case USER_LOGIN:
       return {
-        _c_logIdx: action.adminInfo._c_logIdx,
-        _c_logSign: action.adminInfo._c_logSign,
-        _c_logCIdx: action.adminInfo._c_logCIdx,
-        _c_logNm: action.adminInfo._c_logNm,
-        _c_logMobile: action.adminInfo._c_logMobile,
-        _c_logPhone: action.adminInfo._c_logPhone,
-        _c_logEmail: action.adminInfo._c_logEmail,
-        _c_logPosi: action.adminInfo._c_logPosi,
-        _c_logDept: action.adminInfo._c_logDept,
-        _c_logAdTp: action.adminInfo._c_logAdTp,
-        _c_logNmCnt: action.adminInfo._c_logNmCnt,
-        _c_logUNmCnt: action.adminInfo._c_logUNmCnt,
-        _c_logImgNum: action.adminInfo._c_logImgNum,
+        // _c_logIdx: action.adminInfo._c_logIdx,
+        // _c_logSign: action.adminInfo._c_logSign,
+        // _c_logCIdx: action.adminInfo._c_logCIdx,
+        // _c_logNm: action.adminInfo._c_logNm,
+        // _c_logMobile: action.adminInfo._c_logMobile,
+        // _c_logPhone: action.adminInfo._c_logPhone,
+        // _c_logEmail: action.adminInfo._c_logEmail,
+        // _c_logPosi: action.adminInfo._c_logPosi,
+        // _c_logDept: action.adminInfo._c_logDept,
+        // _c_logAdTp: action.adminInfo._c_logAdTp,
+        // _c_logNmCnt: action.adminInfo._c_logNmCnt,
+        // _c_logUNmCnt: action.adminInfo._c_logUNmCnt,
+        // _c_logImgNum: action.adminInfo._c_logImgNum,
+        ...action.adminInfo,
         isLogin: true,
       }
     case USER_LOGOUT:
-      return {
-        _c_logIdx: 0,
-        _c_logSign: 0,
-        _c_logCIdx: 0,
-        _c_logNm: '',
-        _c_logMobile: '',
-        _c_logPhone: '',
-        _c_logEmail: '',
-        _c_logPosi: '',
-        _c_logDept: '',
-        _c_logAdTp: 0,
-        _c_logNmCnt: 0,
-        _c_logUNmCnt: 0,
-        _c_logImgNum: 0,
-        isLogin: false,
-      };
+      // return {
+      //   _c_logIdx: 0,
+      //   _c_logSign: 0,
+      //   _c_logCIdx: 0,
+      //   _c_logNm: '',
+      //   _c_logMobile: '',
+      //   _c_logPhone: '',
+      //   _c_logEmail: '',
+      //   _c_logPosi: '',
+      //   _c_logDept: '',
+      //   _c_logAdTp: 0,
+      //   _c_logNmCnt: 0,
+      //   _c_logUNmCnt: 0,
+      //   _c_logImgNum: 0,
+      //   isLogin: false,
+      // };
+      return initialState;
     default:
       return state;
   }

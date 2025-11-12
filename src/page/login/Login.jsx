@@ -3,6 +3,7 @@ import { api } from "api/api";
 import { userLogin } from "store/authUser";
 import { useDispatch } from "react-redux";
 import { fnAlertReturn } from 'common/js/function';
+import { useLoading } from "context/LoadingContext";
 
 import style from './css/login.module.css'
 const Login = () => {
@@ -11,6 +12,8 @@ const Login = () => {
     // → 액션(userLogin, userLogout 등)을 실행할 때 사용
     const dispatch = useDispatch();
     const [loginInfo, setLoginInfo] = useState({ adminId: 'qwc22', adminPwd: '1234' });
+
+    const { setIsLoading } = useLoading();
 
     const getAdminId = (e) => {
         setLoginInfo((prev) => {
@@ -40,9 +43,11 @@ const Login = () => {
             , pw: loginInfo.adminPwd
             , at_login: false
         };
-
+        try {
+        setIsLoading(true);
         const res = await api.post("/login/login", paramMap);
         const resData = res.data;
+        console.log(resData);
 
 
         if (resData === 0) {
@@ -69,6 +74,12 @@ const Login = () => {
         } else {
             alert("회원 정보를 불러오지 못했습니다. 관리자에게 문의하세요.");
         }
+        } catch (err) {
+            alert("실패");
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // 엔터키 처리
@@ -80,12 +91,12 @@ const Login = () => {
     
     return (
         <>
-            <section className={style.loadingLayer}>
+            {/* <section className={style.loadingLayer}>
                 <div className={style.loadingBg}></div>
                 <div className={style.loadingImg}>
                     <img src="/images/loading.png" alt="로딩중..." />
                 </div>
-            </section>
+            </section> */}
 
             {/* <section className="loginCont"> */}
             <section className={style.loginCont}>

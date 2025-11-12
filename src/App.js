@@ -16,12 +16,13 @@ import System_02 from 'page/system/System_02';
 
 import HeaderLayout from 'component/layout/HeaderLayout';
 import HeadLeftLayout from 'component/layout/HeadLeftLayout';
+import LoadingLayer from "component/LoadingLayer";
 
+import { LoadingProvider } from "context/LoadingContext";
 import 'common/css/common.css';
 
 
 function App() {
-
   // a태그 # 링크 기본이동 방지
   useEffect(() => { 
     const handler = (e) => {
@@ -56,39 +57,46 @@ function App() {
     }
 
   }, [localLoginInfo]); // localLoginInfo 값이 변경될 때마다 실행
+
   // 로그인시
   if (adminUser.isLogin) {
     return (
       <>
-        <BrowserRouter>
-          <Routes>
+        <LoadingProvider>
+          <BrowserRouter>
+            <LoadingLayer />
+            <Routes>
 
-            <Route element={<HeaderLayout />}>
-              <Route path="/" element={<Main />}></Route>
-            </Route>
+              <Route element={<HeaderLayout />}>
+                <Route path="/" element={<Main />}></Route>
+              </Route>
 
-            <Route element={<HeadLeftLayout />}>
-              <Route path="/report/01" element={<Report_01 />}></Route>
-              <Route path="/schedule/01" element={<Schedule_01 />}></Route>
-              <Route path="/user/01" element={<User_01 />}></Route>
-              <Route path="/board/01" element={<Board_01 />}></Route>
-              <Route path="/board/02" element={<Board_02 />}></Route>
-              <Route path="/board/03" element={<Board_03 />}></Route>
-              <Route path="/system/01" element={<System_01 />}></Route>
-              <Route path="/system/02" element={<System_02 />}></Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
+              <Route element={<HeadLeftLayout />}>
+                <Route path="/report/01" element={<Report_01 />}></Route>
+                <Route path="/schedule/01" element={<Schedule_01 />}></Route>
+                <Route path="/user/01" element={<User_01 />}></Route>
+                <Route path="/board/01" element={<Board_01 />}></Route>
+                <Route path="/board/02" element={<Board_02 />}></Route>
+                <Route path="/board/03" element={<Board_03 />}></Route>
+                <Route path="/system/01" element={<System_01 />}></Route>
+                <Route path="/system/02" element={<System_02 />}></Route>
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </LoadingProvider>
       </>
     );
   } else {
     return (
       <>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Login />}></Route>
-          </Routes>
-        </BrowserRouter>
+        <LoadingProvider>
+          <BrowserRouter>
+            <LoadingLayer />
+            <Routes>
+              <Route path="/" element={<Login />}></Route>
+            </Routes>
+          </BrowserRouter>
+        </LoadingProvider>
       </>
     );
   }

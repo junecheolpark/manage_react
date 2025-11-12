@@ -3,6 +3,7 @@ import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { fnCodeSelList, fnBlank, fnAlertReturn } from 'common/js/function';
 import Pagination from 'component/Pagination';
+import { useLoading } from "context/LoadingContext";
 
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
@@ -12,6 +13,7 @@ import style from './css/user_01.module.css';
 
 const User_01 = () => {
     const adminUser = useSelector(state => state.authUser);
+    const { setIsLoading } = useLoading();
 
     // 공통코드 셀렉트박스 셋팅
 
@@ -44,7 +46,7 @@ const User_01 = () => {
     /*************************************** */
      // 페이지네이션
      const [curPage, setCurPage] = useState(1); // 현재페이지
-     const [pageSize] = useState(5); // 페이지에 표시할 행 개수
+     const [pageSize] = useState(10); // 페이지에 표시할 행 개수
      const [totalCnt, setTotalCnt] = useState(0); // 총개수
      /****************************************************/
      // 사용사 리스트 불러오기
@@ -78,6 +80,7 @@ const User_01 = () => {
             desc: 0,
         };
         try {
+            setIsLoading(true);
             const res = await api.get("/user/listTotal", { params });
             const total = res.data;
 
@@ -86,6 +89,7 @@ const User_01 = () => {
 
             fnSortList(total, params); // 기존 함수 호출
         } catch (err) {
+            setIsLoading(false);
             console.error("요청 실패:", err);
             alert("불러오기 실패");
         }
@@ -105,6 +109,8 @@ const User_01 = () => {
         } catch (err) {
             alert("목록 불러오기 실패");
             console.error(err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -164,9 +170,10 @@ const User_01 = () => {
             uidx: uidx,
         };
         try {
+            setIsLoading(true);
             const res = await api.get("/user/view", { params });
-             console.log(res)
             const resData = res.data;
+            console.log(resData)
 
             const emailParts = (resData.email || "@").split("@");
             const [emailId, emailDomain] = emailParts;
@@ -183,6 +190,8 @@ const User_01 = () => {
         } catch (err) {
             alert("목록 불러오기 실패");
             console.error(err);
+        } finally {
+            setIsLoading(false);
         }
         // alert(`사용자 상세 보기: ${uidx}`);
     }
@@ -234,6 +243,7 @@ const User_01 = () => {
         };
 
         try {
+            setIsLoading(true);
             const res = await api.post("/user/input", paramMap);
             const result = res.data;
 
@@ -251,6 +261,8 @@ const User_01 = () => {
         } catch (err) {
             console.error(err);
             alert("요청 실패");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -468,9 +480,10 @@ const User_01 = () => {
                                 </th>
                                 <td><input type="text" name="user_ID" value={userView.user_ID || ""} onChange={userViewChange} /></td>
                                 <th>
-                                    <span className="colRed" id="pwRequired">{selUser === 0 ? "*" : ""}</span> 비밀번호
+                                    <span className="colRed">{selUser === 0 ? "*" : ""}</span> 비밀번호
                                 </th>
-                                <td><input type="password" name="user_PW" onChange={userViewChange} /></td>
+                                <td><input type="text" name="user_PW" value={userView.user_PW || ""} 
+                                    placeholder={selUser > 0 ? "비밀번호 변경시 입력" : ""} onChange={userViewChange} /></td>
                             </tr>
                             <tr>
                                 <th>일반전화</th>
