@@ -626,21 +626,11 @@ const User_01 = () => {
                                             <input type="text" name="emailId" value={userView.emailId || ""} onChange={userViewChange} />
                                         </div>
                                         <div style={{ width: "20px", paddingRight: "5px" }}>@</div>
-                                        <div 
-                                            ref={ref}
-                                            style={{
-                                                minWidth: "200px" ,
-                                                position: "relative",
-                                                display: "inline-block", // input 크기에 맞춰 정렬
-                                                width: "250px",
-                                                verticalAlign: "top",
-                                                zIndex: 999,
-                                            }}
-                                        >
+                                        <div ref={ref} className={style.emailDomainDiv}>
                                             <input type="text" name="emailDomain" className="ui-autocomplete-input" type="text"
                                                 maxLength="50" placeholder="이메일 검색 후 선택"
                                                 value={userView.emailDomain || ""} onChange={userViewChange}
-                                                onFocus={() => filtered.length > 0 && setEmailOpen(true)}
+                                                // onFocus={() => filtered.length > 0 && setEmailOpen(true)}
                                                 onKeyDown={(e) => {
                                                     if (e.key === "Enter" && filtered.length > 0) {
                                                         const first = filtered[0];
@@ -652,25 +642,13 @@ const User_01 = () => {
                                                 }}
                                                 style={{ width: "100%", padding: "8px" }}
                                             />
-                                            <div id="emailSchResult"
-                                                style={{
-                                                    position: "absolute",
-                                                    top: "100%",             // input 바로 아래
-                                                    left: 0,
-                                                    width: "100%",
-                                                    background: "#fff",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "4px",
-                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                                                    zIndex: 1000,
-                                                    maxHeight: "180px",
-                                                    overflowY: "auto",
+                                            <div id="emailSchResult" className={style.emailSchResult}                                                
+                                            style={{
                                                     display: emailOpen && filtered.length > 0 ? "block" : "none",
                                                 }}
                                             >
                                                 <ul
                                                     className="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"
-                                                    style={{ listStyle: "none", margin: 0, padding: 0 }}
                                                 >
                                                     {filtered.map((item, i) => (
                                                         <li
@@ -686,13 +664,7 @@ const User_01 = () => {
                                                                 setEmailOpen(false); //  클릭 시 닫기
                                                             }}
                                                             style={{
-                                                                padding: "6px 10px",
-                                                                whiteSpace: "nowrap",         // 줄바꿈 방지
-                                                                cursor:
-                                                                    item.label === "검색된 이메일이 없습니다."
-                                                                        ? "default"
-                                                                        : "pointer",
-                                                                backgroundColor: "#fff",
+                                                                cursor: item.label === "검색된 이메일이 없습니다." ? "default" : "pointer",
                                                             }}
                                                             onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f5f5")}
                                                             onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}

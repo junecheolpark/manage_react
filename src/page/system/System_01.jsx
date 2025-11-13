@@ -1,341 +1,167 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { api } from "api/api";
+import { useLoading } from "context/LoadingContext";
+import CategoryPanel from "./component/CategoryPanel";
 import style from './css/system_01.module.css'
 
 const System_01 = () => {
-    const [category1List, setCategory1List] = useState([]);
-    const [category2List, setCategory2List] = useState([]);
-    const [category3List, setCategory3List] = useState([]);
+    // =============================
+    // 1) 상태 정의
+    // =============================
 
-    const [cateName1, setCateName1] = useState("");
-    const [cateCode1, setCateCode1] = useState("");
-    const [cateUse1, setCateUse1] = useState("1");
+    const [cate1List, setCate1List] = useState([]);
+    const [cate1Form, setCate1Form] = useState({ name: "", code: "", use: 1 });
 
-    const [cateName2, setCateName2] = useState("");
-    const [cateCode2, setCateCode2] = useState("");
-    const [cateUse2, setCateUse2] = useState("1");
+    const [cate2List, setCate2List] = useState([]);
+    const [cate2Form, setCate2Form] = useState({ name: "", code: "", use: 1 });
 
-    const [cateName3, setCateName3] = useState("");
-    const [cateCode3, setCateCode3] = useState("");
-    const [cateUse3, setCateUse3] = useState("1");
+    const [cate3List, setCate3List] = useState([]);
+    const [cate3Form, setCate3Form] = useState({ name: "", code: "", use: 1 });
 
-    const handleAddCategory = (level) => {
-        if (level === 1) {
-            setCategory1List([
-                ...category1List,
-                { code: cateCode1, name: cateName1, use: cateUse1 },
-            ]);
-            setCateName1("");
-            setCateCode1("");
-        } else if (level === 2) {
-            setCategory2List([
-                ...category2List,
-                { code: cateCode2, name: cateName2, use: cateUse2 },
-            ]);
-            setCateName2("");
-            setCateCode2("");
-        } else if (level === 3) {
-            setCategory3List([
-                ...category3List,
-                { code: cateCode3, name: cateName3, use: cateUse3 },
-            ]);
-            setCateName3("");
-            setCateCode3("");
+    const [loading, setLoading] = useState(false);
+
+
+    // =============================
+    // 2) API 호출 함수
+    // =============================
+
+    const loadCategory = async (level, parentIdx) => {
+        try {
+            setLoading(true);
+            const res = await api.get("/code/list", { params: { idx: parentIdx } });
+            console.log(res);
+
+            if (level === 1) setCate1List(res.data);
+            if (level === 2) setCate2List(res.data);
+            if (level === 3) setCate3List(res.data);
+        } catch (e) {
+            alert("로드 실패");
+        } finally {
+            setLoading(false);
         }
     };
+
+
+    // =============================
+    // 3) 항목 클릭 시 하위 목록 로딩
+    // =============================
+
+    const handleSelectCate1 = (item) => {
+        setCate1Form({
+            name: item.code_NM,
+            code: item.code_ID,
+            use: item.code_STS,
+        });
+
+        loadCategory(2, item.code_IDX);
+    };
+
+    const handleSelectCate2 = (item) => {
+        setCate2Form({
+            name: item.code_NM,
+            code: item.code_ID,
+            use: item.code_STS,
+        });
+
+        loadCategory(3, item.code_IDX);
+    };
+
+    const handleSelectCate3 = (item) => {
+        setCate3Form({
+            name: item.code_NM,
+            code: item.code_ID,
+            use: item.code_STS,
+        });
+    };
+
+
+    // =============================
+    // 4) 입력 변경
+    // =============================
+
+    const onChange1 = (key, value) =>
+        setCate1Form((prev) => ({ ...prev, [key]: value }));
+
+    const onChange2 = (key, value) =>
+        setCate2Form((prev) => ({ ...prev, [key]: value }));
+
+    const onChange3 = (key, value) =>
+        setCate3Form((prev) => ({ ...prev, [key]: value }));
+
+
+    // =============================
+    // 5) 저장 / 취소
+    // =============================
+
+    const saveCate1 = () => alert("대분류 저장 API 연결");
+    const saveCate2 = () => alert("중분류 저장 API 연결");
+    const saveCate3 = () => alert("소분류 저장 API 연결");
+
+    const cancel = (level) => {
+
+        if (level <= 3) {
+            setCate3Form({ name: "", code: "", use: 1 });
+            setCate3List([]);
+        }
+
+        if (level <= 2) {
+            setCate2Form({ name: "", code: "", use: 1 });
+            setCate2List([]);
+        }
+
+        if (level <= 1) {
+            setCate1Form({ name: "", code: "", use: 1 });
+            setCate1List([]);
+        }
+    };
+
+
+    // =============================
+    // 6) UI 렌더링
+    // =============================
 
     return (
         <section className="contens">
             <section className={style.codeManagement}>
                 {/* 대분류 */}
-                <section className="shadowBox">
-                    <div className="tableTitle pdB10">
-                        <p className="ftBold">&nbsp;대분류</p>
-                    </div>
-
-                    <div className="DivScrollY AllBorder" style={{ height: "500px" }}>
-                        <table className="tableList">
-                            <thead>
-                                <tr>
-                                    <th>코드</th>
-                                    <th>코드명</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {category1List.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="colGray2 ftSize12">
-                                            검색된 내용이 없습니다.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    category1List.map((item, i) => (
-                                        <tr key={i}>
-                                            <td>{item.code}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.use === "1" ? "사용" : "미사용"}</td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="pdT10">
-                        <table className="tableView">
-                            <tbody>
-                                <tr>
-                                    <th>코드명</th>
-                                    <td colSpan="3">
-                                        <input
-                                            type="text"
-                                            value={cateName1}
-                                            onChange={(e) => setCateName1(e.target.value)}
-                                            maxLength="50"
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>코드</th>
-                                    <td colSpan="3">
-                                        <input
-                                            type="text"
-                                            value={cateCode1}
-                                            onChange={(e) => setCateCode1(e.target.value)}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>사용 여부</th>
-                                    <td colSpan="3">
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="CateUse1"
-                                                value="1"
-                                                checked={cateUse1 === "1"}
-                                                onChange={(e) => setCateUse1(e.target.value)}
-                                            />
-                                            사용
-                                        </label>
-                                        &nbsp;&nbsp;
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="CateUse1"
-                                                value="0"
-                                                checked={cateUse1 === "0"}
-                                                onChange={(e) => setCateUse1(e.target.value)}
-                                            />
-                                            미사용
-                                        </label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="pdT10 btnRight">
-                        <a href="#"  className="btn btnBlue" onClick={() => handleAddCategory(1)}>
-                            추가
-                        </a>
-                        <a href="#"  className="btn btnWhite">취소</a>
-                    </div>
-                </section>
+                <CategoryPanel
+                    title="대분류"
+                    level={1}
+                    list={cate1List}
+                    form={cate1Form}
+                    onSelect={handleSelectCate1}
+                    onChange={onChange1}
+                    onSave={saveCate1}
+                    onCancel={() =>cancel(1)}
+                />
 
                 {/* 중분류 */}
-                <section className="shadowBox">
-                    <div className="tableTitle pdB10">
-                        <p className="ftBold">&nbsp;중분류</p>
-                    </div>
-
-                    <div className="DivScrollY AllBorder" style={{ height: "500px" }}>
-                        <table className="tableList">
-                            <thead>
-                                <tr>
-                                    <th>코드</th>
-                                    <th>코드명</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {category2List.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="colGray2 ftSize12">
-                                            대분류를 선택해 주세요.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    category2List.map((item, i) => (
-                                        <tr key={i}>
-                                            <td>{item.code}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.use === "1" ? "사용" : "미사용"}</td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="pdT10">
-                        <table className="tableView">
-                            <tbody>
-                                <tr>
-                                    <th>코드명</th>
-                                    <td colSpan="3">
-                                        <input
-                                            type="text"
-                                            value={cateName2}
-                                            onChange={(e) => setCateName2(e.target.value)}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>코드</th>
-                                    <td colSpan="3">
-                                        <input
-                                            type="text"
-                                            value={cateCode2}
-                                            onChange={(e) => setCateCode2(e.target.value)}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>사용 여부</th>
-                                    <td colSpan="3">
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="CateUse2"
-                                                value="1"
-                                                checked={cateUse2 === "1"}
-                                                onChange={(e) => setCateUse2(e.target.value)}
-                                            />
-                                            사용
-                                        </label>
-                                        &nbsp;&nbsp;
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="CateUse2"
-                                                value="0"
-                                                checked={cateUse2 === "0"}
-                                                onChange={(e) => setCateUse2(e.target.value)}
-                                            />
-                                            미사용
-                                        </label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="pdT10 btnRight">
-                        <a href="#"  className="btn btnBlue" onClick={() => handleAddCategory(2)}>
-                            추가
-                        </a>
-                        <a href="#"  className="btn btnWhite">취소</a>
-                    </div>
-                </section>
+                <CategoryPanel
+                    title="중분류"
+                    level={2}
+                    list={cate2List}
+                    form={cate2Form}
+                    onSelect={handleSelectCate2}
+                    onChange={onChange2}
+                    onSave={saveCate2}
+                    onCancel={() => cancel(2)}
+                />
 
                 {/* 소분류 */}
-                <section className="shadowBox">
-                    <div className="tableTitle pdB10">
-                        <p className="ftBold">&nbsp;소분류</p>
-                    </div>
+                <CategoryPanel
+                    title="소분류"
+                    level={3}
+                    list={cate3List}
+                    form={cate3Form}
+                    onSelect={handleSelectCate3}
+                    onChange={onChange3}
+                    onSave={saveCate3}
+                    onCancel={() => cancel(3)}
+                />
 
-                    <div className="DivScrollY AllBorder" style={{ height: "500px" }}>
-                        <table className="tableList">
-                            <thead>
-                                <tr>
-                                    <th>코드</th>
-                                    <th>코드명</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {category3List.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="colGray2 ftSize12">
-                                            중분류를 선택해 주세요.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    category3List.map((item, i) => (
-                                        <tr key={i}>
-                                            <td>{item.code}</td>
-                                            <td>{item.name}</td>
-                                            <td>{item.use === "1" ? "사용" : "미사용"}</td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="pdT10">
-                        <table className="tableView">
-                            <tbody>
-                                <tr>
-                                    <th>코드명</th>
-                                    <td colSpan="3">
-                                        <input
-                                            type="text"
-                                            value={cateName3}
-                                            onChange={(e) => setCateName3(e.target.value)}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>코드</th>
-                                    <td colSpan="3">
-                                        <input
-                                            type="text"
-                                            value={cateCode3}
-                                            onChange={(e) => setCateCode3(e.target.value)}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>사용 여부</th>
-                                    <td colSpan="3">
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="CateUse3"
-                                                value="1"
-                                                checked={cateUse3 === "1"}
-                                                onChange={(e) => setCateUse3(e.target.value)}
-                                            />
-                                            사용
-                                        </label>
-                                        &nbsp;&nbsp;
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name="CateUse3"
-                                                value="0"
-                                                checked={cateUse3 === "0"}
-                                                onChange={(e) => setCateUse3(e.target.value)}
-                                            />
-                                            미사용
-                                        </label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="pdT10 btnRight">
-                        <a href="#"  className="btn btnBlue" onClick={() => handleAddCategory(3)}>
-                            추가
-                        </a>
-                        <a href="#"  className="btn btnWhite">취소</a>
-                    </div>
-                </section>
+                {/* 대분류 최초 로드 */}
             </section>
-        </section>
+        </section >
     )
 }
 
