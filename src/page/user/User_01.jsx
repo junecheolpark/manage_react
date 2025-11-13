@@ -16,7 +16,6 @@ const User_01 = () => {
     const { setIsLoading } = useLoading();
 
     // 공통코드 셀렉트박스 셋팅
-
     const [selPosi, setSelPosi] = useState([]);
     const [selDept, setSelDept] = useState([]);
     const [selSchUserSts, setSelSchUserSts] = useState([]);
@@ -114,7 +113,7 @@ const User_01 = () => {
         }
     };
 
-    // 엔터키 처리
+    // 검색 엔터키 처리
     const enterKey = (e) => {
         if (e.keyCode === 13) {
             setCurPage(1);
@@ -196,13 +195,6 @@ const User_01 = () => {
         // alert(`사용자 상세 보기: ${uidx}`);
     }
 
-    // 취소 버튼 클릭시 데이터 초기화
-    const fnUserCancel = () => {
-        setUserView(defaultUserView);
-        setSelUser(0);
-        setIsEditable(false);
-    }
-
     const userViewChange = (e) => {
         const { name, value } = e.target;
         setUserView((prev) => ({
@@ -266,6 +258,12 @@ const User_01 = () => {
         }
     };
 
+    // 취소 버튼 클릭시 데이터 초기화
+    const fnUserCancel = () => {
+        setUserView(defaultUserView);
+        setSelUser(0);
+        setIsEditable(false);
+    }
     //***************** 주소 검색 ********************** */
     const layerRef = useRef(null);
 
@@ -331,6 +329,75 @@ const User_01 = () => {
     }, []);
 
     /*************************************** */
+
+
+    // 이메일 입력시 자동완성 검색
+
+    // const [emailInput, setEmailInput] = useState("");
+    const [emailList, setEmailList] = useState([]); // 전체 데이터
+    const [filtered, setFiltered] = useState([]); // 검색 결과
+    const [emailOpen, setEmailOpen] = useState(false);
+    const ref = useRef(null);
+
+    // 처음에 배열 가져오기
+    useEffect(() => {
+        const fetchEmailList = async () => {
+            try {
+                setIsLoading(true);
+                const params = {
+                    pidx: 19,
+                    cid: "",
+                    cnm: "",
+                };
+                const res = await api.get("/common/codeSelList", { params });
+                const resData = res.data;
+                //console.log(resData)
+                setEmailList(resData.map((v) => ({ label: v.code_NM, value: v.code_IDX })));
+            } catch {
+                alert("이메일 목록을 불러오지 못했습니다.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchEmailList();
+    }, []);
+
+    //  입력값 변경 시 로컬 배열에서 필터링
+    useEffect(() => {
+        const emailInput = userView.emailDomain || "";
+        if (!emailInput.trim()) {
+            setFiltered([]);
+            return;
+        }
+
+        const result = emailList.filter((item) =>
+            item.label.toLowerCase().includes(emailInput.toLowerCase())
+        );
+
+        // console.log(result)
+        setFiltered(
+            result.length > 0
+                ? result
+                : [{ label: "검색된 이메일이 없습니다.", value: 0 }]
+        );
+        setEmailOpen(true);
+    }, [userView.emailDomain, emailList]);
+
+    //  외부 클릭 시 목록 닫기
+    useEffect(() => {
+        const clickOutside = (e) => {
+            if (ref.current && !ref.current.contains(e.target)) setEmailOpen(false);
+        };
+        document.addEventListener("mousedown", clickOutside);
+        return () => document.removeEventListener("mousedown", clickOutside);
+    }, []);
+
+    // 4️⃣ 선택 시 입력창에 반영
+    const handleSelect = (label) => {
+        if (label === "검색된 이메일이 없습니다.") return;
+        userViewChange({ target: { name: "emailDomain", value: label } });
+        setEmailOpen(false);
+    };
 
 
 
@@ -559,9 +626,86 @@ const User_01 = () => {
                                             <input type="text" name="emailId" value={userView.emailId || ""} onChange={userViewChange} />
                                         </div>
                                         <div style={{ width: "20px", paddingRight: "5px" }}>@</div>
-                                        <div style={{ minWidth: "200px" }}>
-                                            <input type="text" name="emailDomain" placeholder="이메일 검색 후 선택" value={userView.emailDomain || ""} onChange={userViewChange} />
-                                            <div id="emailSchResult"></div>
+                                        <div 
+                                            ref={ref}
+                                            style={{
+                                                minWidth: "200px" ,
+                                                position: "relative",
+                                                display: "inline-block", // input 크기에 맞춰 정렬
+                                                width: "250px",
+                                                verticalAlign: "top",
+                                                zIndex: 999,
+                                            }}
+                                        >
+                                            <input type="text" name="emailDomain" className="ui-autocomplete-input" type="text"
+                                                maxLength="50" placeholder="이메일 검색 후 선택"
+                                                value={userView.emailDomain || ""} onChange={userViewChange}
+                                                onFocus={() => filtered.length > 0 && setEmailOpen(true)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter" && filtered.length > 0) {
+                                                        const first = filtered[0];
+                                                        if (first.label !== "검색된 이메일이 없습니다.") {
+                                                            userViewChange({ target: { name: "emailDomain", value: first.label } });
+                                                        }
+                                                        setEmailOpen(false);
+                                                    }
+                                                }}
+                                                style={{ width: "100%", padding: "8px" }}
+                                            />
+                                            <div id="emailSchResult"
+                                                style={{
+                                                    position: "absolute",
+                                                    top: "100%",             // input 바로 아래
+                                                    left: 0,
+                                                    width: "100%",
+                                                    background: "#fff",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+                                                    zIndex: 1000,
+                                                    maxHeight: "180px",
+                                                    overflowY: "auto",
+                                                    display: emailOpen && filtered.length > 0 ? "block" : "none",
+                                                }}
+                                            >
+                                                <ul
+                                                    className="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content"
+                                                    style={{ listStyle: "none", margin: 0, padding: 0 }}
+                                                >
+                                                    {filtered.map((item, i) => (
+                                                        <li
+                                                            className="ui-menu-item"
+                                                            key={i}
+                                                            onMouseDown={(e) => {
+                                                                e.preventDefault(); // blur 방지
+                                                                if (item.label !== "검색된 이메일이 없습니다.") {
+                                                                    userViewChange({
+                                                                        target: { name: "emailDomain", value: item.label },
+                                                                    });
+                                                                }
+                                                                setEmailOpen(false); //  클릭 시 닫기
+                                                            }}
+                                                            style={{
+                                                                padding: "6px 10px",
+                                                                whiteSpace: "nowrap",         // 줄바꿈 방지
+                                                                cursor:
+                                                                    item.label === "검색된 이메일이 없습니다."
+                                                                        ? "default"
+                                                                        : "pointer",
+                                                                backgroundColor: "#fff",
+                                                            }}
+                                                            onMouseEnter={(e) => (e.currentTarget.style.background = "#f5f5f5")}
+                                                            onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: item.label.replace(
+                                                                    new RegExp(`(${userView.emailDomain || ""})`, "gi"),
+                                                                    "<strong style='color:#0066cc'>$1</strong>"
+                                                                ),
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
