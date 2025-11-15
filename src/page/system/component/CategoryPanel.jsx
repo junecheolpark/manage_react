@@ -1,13 +1,18 @@
 const CategoryPanel = ({
     title,
     level,
-    data = [],
+    list = [],
     form,
     onSelect,
     onFormChange,
     onSave,
     onCancel,
 }) => {
+
+    const safeList = Array.isArray(list) ? list : [];
+    console.log(level)
+    console.log(list)
+    console.log(safeList)
 
     return (
         <section className="shadowBox">
@@ -28,7 +33,7 @@ const CategoryPanel = ({
                     </thead>
 
                     <tbody>
-                        {data.length === 0 && (
+                        {safeList.length === 0 && (
                             <tr>
                                 <td colSpan={level > 1 ? 4 : 3} className="colGray2 ftSize12">
                                     {level === 1
@@ -40,7 +45,7 @@ const CategoryPanel = ({
                             </tr>
                         )}
 
-                        {data.map((item) => (
+                        {safeList.map((item) => (
                             <tr key={item.code_IDX}>
                                 <td>{item.code_ID}</td>
                                 <td>

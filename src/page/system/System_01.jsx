@@ -29,11 +29,20 @@ const System_01 = () => {
         try {
             setLoading(true);
             const res = await api.get("/code/list", { params: { idx: parentIdx } });
-            console.log(res);
 
-            if (level === 1) setCate1List(res.data);
-            if (level === 2) setCate2List(res.data);
-            if (level === 3) setCate3List(res.data);
+            if (level === 1) {
+                setCate1List(res.data);
+                console.log(res.data); // 값존재
+            }
+
+            if (level === 2) {
+                setCate2List(res.data);
+            }
+
+            if (level === 3) {
+                setCate3List(res.data);
+            }
+
         } catch (e) {
             alert("로드 실패");
         } finally {
@@ -47,6 +56,7 @@ const System_01 = () => {
     // =============================
 
     const handleSelectCate1 = (item) => {
+        
         setCate1Form({
             name: item.code_NM,
             code: item.code_ID,
@@ -119,6 +129,10 @@ const System_01 = () => {
     // =============================
     // 6) UI 렌더링
     // =============================
+
+    useEffect(() => {
+        loadCategory(1, 0);
+        }, []);
 
     return (
         <section className="contens">
