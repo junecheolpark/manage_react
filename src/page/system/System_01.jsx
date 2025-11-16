@@ -32,7 +32,7 @@ const System_01 = () => {
 
             if (level === 1) {
                 setCate1List(res.data);
-                console.log(res.data); // 값존재
+                // console.log(res.data); // 값존재
             }
 
             if (level === 2) {
@@ -56,7 +56,7 @@ const System_01 = () => {
     // =============================
 
     const handleSelectCate1 = (item) => {
-        
+        console.log(item)
         setCate1Form({
             name: item.code_NM,
             code: item.code_ID,
@@ -121,7 +121,7 @@ const System_01 = () => {
 
         if (level <= 1) {
             setCate1Form({ name: "", code: "", use: 1 });
-            setCate1List([]);
+            // setCate1List([]);
         }
     };
 

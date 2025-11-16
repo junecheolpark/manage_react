@@ -10,9 +10,6 @@ const CategoryPanel = ({
 }) => {
 
     const safeList = Array.isArray(list) ? list : [];
-    console.log(level)
-    console.log(list)
-    console.log(safeList)
 
     return (
         <section className="shadowBox">
@@ -23,6 +20,11 @@ const CategoryPanel = ({
             {/* 리스트 */}
             <div className="DivScrollY AllBorder" style={{ height: 500 }}>
                 <table className="tableList">
+                    <colgroup>
+                        <col style={{ width: "20%" }} />
+                        <col style={{ width: "60%" }} />
+                        <col style={{ width: "20%" }} />
+                    </colgroup>
                     <thead>
                         <tr>
                             <th>코드</th>
@@ -39,8 +41,8 @@ const CategoryPanel = ({
                                     {level === 1
                                         ? "대분류 목록이 없습니다."
                                         : level === 2
-                                            ? "중분류를 선택해 주세요."
-                                            : "소분류를 선택해 주세요."}
+                                            ? "대분류를 선택해 주세요."
+                                            : "중분류를 선택해 주세요."}
                                 </td>
                             </tr>
                         )}
@@ -48,11 +50,8 @@ const CategoryPanel = ({
                         {safeList.map((item) => (
                             <tr key={item.code_IDX}>
                                 <td>{item.code_ID}</td>
-                                <td>
-                                    <a href="#" href="#"
-                                        onClick={() => onSelect(item)}
-                                        className="linkBtn"
-                                    >
+                                <td onClick={() => onSelect(item)}>
+                                    <a href="#" href="#" className="linkBtn">
                                         {item.code_NM}
                                     </a>
                                 </td>
@@ -61,6 +60,7 @@ const CategoryPanel = ({
                                 {level > 1 && (
                                     <td>
                                         <a href="#"><img src="/images/icon/ic_arrow_u.gif" alt="▲" /></a>
+                                        <br/>
                                         <a href="#"><img src="/images/icon/ic_arrow_d.gif" alt="▼" /></a>
                                     </td>
                                 )}
