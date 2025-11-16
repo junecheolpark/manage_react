@@ -163,3 +163,22 @@ export const fnBlank = (pVal, pReverse) => {
 
   return val;
 };
+
+
+/**
+ * 넘어온 값이 빈값인지 체크
+ * @param {string|number|Object} value 입력값
+ * @returns {boolean} true = 통과 / false = 실패
+ */
+export const isEmpty = (value) => {
+  if (
+    value === "" ||
+    value === null ||
+    value === undefined ||
+    (typeof value === "object" && !Object.keys(value).length) ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
+    return true;
+  }
+  return false;
+};

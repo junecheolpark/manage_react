@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react";
 import { api } from "api/api";
 import { useLoading } from "context/LoadingContext";
 import CategoryPanel from "./component/CategoryPanel";
+
+
 import style from './css/system_01.module.css'
 
 const System_01 = () => {
+    const { setIsLoading } = useLoading();
     // =============================
     // 1) 상태 정의
     // =============================
+    // list = 코드관련 리스트 
+    // form = 입력값 관련
 
     const [cate1List, setCate1List] = useState([]);
     const [cate1Form, setCate1Form] = useState({ name: "", code: "", use: 1 });
@@ -18,7 +23,6 @@ const System_01 = () => {
     const [cate3List, setCate3List] = useState([]);
     const [cate3Form, setCate3Form] = useState({ name: "", code: "", use: 1 });
 
-    const [loading, setLoading] = useState(false);
 
 
     // =============================
@@ -27,7 +31,7 @@ const System_01 = () => {
 
     const loadCategory = async (level, parentIdx) => {
         try {
-            setLoading(true);
+            setIsLoading(true);
             const res = await api.get("/code/list", { params: { idx: parentIdx } });
 
             if (level === 1) {
@@ -46,33 +50,31 @@ const System_01 = () => {
         } catch (e) {
             alert("로드 실패");
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
 
-    // =============================
     // 3) 항목 클릭 시 하위 목록 로딩
-    // =============================
 
     const handleSelectCate1 = (item) => {
-        console.log(item)
         setCate1Form({
             name: item.code_NM,
             code: item.code_ID,
             use: item.code_STS,
         });
-
+        cancel(2);
         loadCategory(2, item.code_IDX);
     };
 
     const handleSelectCate2 = (item) => {
+        
         setCate2Form({
             name: item.code_NM,
             code: item.code_ID,
             use: item.code_STS,
         });
-
+        cancel(3);
         loadCategory(3, item.code_IDX);
     };
 
@@ -108,20 +110,16 @@ const System_01 = () => {
     const saveCate3 = () => alert("소분류 저장 API 연결");
 
     const cancel = (level) => {
-
-        if (level <= 3) {
-            setCate3Form({ name: "", code: "", use: 1 });
-            setCate3List([]);
-        }
-
-        if (level <= 2) {
-            setCate2Form({ name: "", code: "", use: 1 });
-            setCate2List([]);
-        }
-
-        if (level <= 1) {
-            setCate1Form({ name: "", code: "", use: 1 });
-            // setCate1List([]);
+        // 레벨 이하 모두 초기화 (의도적 fall-through)
+        switch (level) {
+            case 1: setCate1Form({ name: "", code: "", use: 1 });
+                setCate2List([]);
+            case 2: setCate2Form({ name: "", code: "", use: 1 });
+                setCate3List([]);
+            case 3: setCate3Form({ name: "", code: "", use: 1 });
+                break;
+            default:
+                break;
         }
     };
 
@@ -144,7 +142,7 @@ const System_01 = () => {
                     list={cate1List}
                     form={cate1Form}
                     onSelect={handleSelectCate1}
-                    onChange={onChange1}
+                    onFormChange={onChange1}
                     onSave={saveCate1}
                     onCancel={() =>cancel(1)}
                 />
@@ -156,7 +154,7 @@ const System_01 = () => {
                     list={cate2List}
                     form={cate2Form}
                     onSelect={handleSelectCate2}
-                    onChange={onChange2}
+                    onFormChange={onChange2}
                     onSave={saveCate2}
                     onCancel={() => cancel(2)}
                 />
@@ -168,7 +166,7 @@ const System_01 = () => {
                     list={cate3List}
                     form={cate3Form}
                     onSelect={handleSelectCate3}
-                    onChange={onChange3}
+                    onFormChange={onChange3}
                     onSave={saveCate3}
                     onCancel={() => cancel(3)}
                 />
