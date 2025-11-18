@@ -28,6 +28,7 @@ const System_01 = () => {
         csor: 0,
         ridx: adminUser._c_logIdx
     };
+
     const [cate1List, setCate1List] = useState([]);
     const [cate1Form, setCate1Form] = useState({ ...defaultCateForm, cdep: 1 });
 
@@ -104,7 +105,7 @@ const System_01 = () => {
     };
 
     const handleSelectCate3 = (item) => {
-        setCate2Form({
+        setCate3Form({
             cidx: item.code_IDX,
             pidx: item.parent_IDX,
             cid: item.code_ID,
@@ -135,21 +136,42 @@ const System_01 = () => {
     // 5) 저장 / 취소
     // =============================
 
+    /**
+     * 코드 저장
+     * @param {number} level 1=대분류 / 2=중분류 / 3=소분류
+     */
     const saveCate = async (level) => {
+        // 저장 대상 form 선택
         const paramMap = level === 1 ? cate1Form : level === 2 ? cate2Form : cate3Form;
+        
+        // 필수 입력 체크
         if (!fnAlertReturn(paramMap.cnm, "코드명", '')) return;
         if (!fnAlertReturn(paramMap.cid, "코드", '')) return;
+        
+        //  React 불변성 유지 → 복사해서 수정
+        let newParam = { ...paramMap };
+        
+        // 신규 등록 시(csor === 0) 정렬번호/부모코드/전체코드 자동 설정
+        if (newParam.csor === 0) {
+            // 리스트 길이 (정렬번호 생성용)
+            newParam.csor = level === 1 ? cate1List.length : level === 2 ? cate2List.length : cate3List.length;
+            newParam.pidx = level === 1 ? 0 : level === 2 ? cate1Form.cidx : cate2Form.cidx;
+            newParam.cid = level === 1 ? '' : level === 2 ? cate1Form.cid + newParam.cid : cate2Form.cid + newParam.cid;
+        }
 
-        // console.log(paramMap);
         try {
             setIsLoading(true);
-            const res = await api.post("/code/input", paramMap);
+            const res = await api.post("/code/input", newParam);
             const result = res.data;
 
             if (result === 0) {
                 alert("처리되었습니다.");
+
+                // 입력값 초기화
                 cancel(level);
-                level === 1 ? loadCategory(level, 0) : loadCategory(level, paramMap.pidx);
+
+                // 저장한 레벨만 다시 로딩
+                level === 1 ? loadCategory(1, 0) : loadCategory(level, newParam.pidx);
             } else if (result === 4) {
                 alert("중복된 코드명이 있습니다.");
             } else {

@@ -28,7 +28,7 @@ api.interceptors.response.use(
     return response;
   }
 )
-
+// 
 // export const app_api = axios.create({
 //   baseURL: 'https://api.example.com',
 // });
