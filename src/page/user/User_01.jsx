@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { api } from "api/api";
 import { useSelector } from "react-redux";
-import { fnCodeSelList, fnBlank, fnAlertReturn } from 'common/js/function';
-import Pagination from 'component/Pagination';
 import { useLoading } from "context/LoadingContext";
+import Pagination from 'component/Pagination';
+import { fnCodeSelList, fnBlank, fnAlertReturn } from 'common/js/function';
 
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
@@ -172,7 +172,7 @@ const User_01 = () => {
             setIsLoading(true);
             const res = await api.get("/user/view", { params });
             const resData = res.data;
-            console.log(resData)
+            // console.log(resData)
 
             const emailParts = (resData.email || "@").split("@");
             const [emailId, emailDomain] = emailParts;
@@ -236,7 +236,7 @@ const User_01 = () => {
 
         try {
             setIsLoading(true);
-            const res = await api.post("/user/input", paramMap);
+            const res = await api.post("/user/input",  );
             const result = res.data;
 
             if (result === 0) {

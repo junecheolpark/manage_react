@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { api } from "api/api";
+import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
+import { fnAlertReturn } from 'common/js/function';
+
 import CategoryPanel from "./component/CategoryPanel";
 
 
 import style from './css/system_01.module.css'
 
 const System_01 = () => {
+    const adminUser = useSelector(state => state.authUser);
     const { setIsLoading } = useLoading();
     // =============================
     // 1) 상태 정의
@@ -14,14 +18,24 @@ const System_01 = () => {
     // list = 코드관련 리스트 
     // form = 입력값 관련
 
+    const defaultCateForm = {
+        cidx: 0,
+        pidx: 0,
+        cid: "",
+        cnm: "",
+        cdep: 1,
+        csts: 1,
+        csor: 0,
+        ridx: adminUser._c_logIdx
+    };
     const [cate1List, setCate1List] = useState([]);
-    const [cate1Form, setCate1Form] = useState({ name: "", code: "", use: 1 });
+    const [cate1Form, setCate1Form] = useState({ ...defaultCateForm, cdep: 1 });
 
     const [cate2List, setCate2List] = useState([]);
-    const [cate2Form, setCate2Form] = useState({ name: "", code: "", use: 1 });
+    const [cate2Form, setCate2Form] = useState({ ...defaultCateForm, cdep: 2 });
 
     const [cate3List, setCate3List] = useState([]);
-    const [cate3Form, setCate3Form] = useState({ name: "", code: "", use: 1 });
+    const [cate3Form, setCate3Form] = useState({ ...defaultCateForm, cdep: 3 });
 
 
 
@@ -58,31 +72,47 @@ const System_01 = () => {
     // 3) 항목 클릭 시 하위 목록 로딩
 
     const handleSelectCate1 = (item) => {
+
         setCate1Form({
-            name: item.code_NM,
-            code: item.code_ID,
-            use: item.code_STS,
+            cidx: item.code_IDX,
+            pidx: item.parent_IDX,
+            cid: item.code_ID,
+            cnm: item.code_NM,
+            cdep: item.code_DEPTH,
+            csts: item.code_STS,
+            csor: item.code_SORT,
+            ridx: adminUser._c_logIdx
         });
         cancel(2);
         loadCategory(2, item.code_IDX);
     };
 
     const handleSelectCate2 = (item) => {
-        
+
         setCate2Form({
-            name: item.code_NM,
-            code: item.code_ID,
-            use: item.code_STS,
+            cidx: item.code_IDX,
+            pidx: item.parent_IDX,
+            cid: item.code_ID,
+            cnm: item.code_NM,
+            cdep: item.code_DEPTH,
+            csts: item.code_STS,
+            csor: item.code_SORT,
+            ridx: adminUser._c_logIdx
         });
         cancel(3);
         loadCategory(3, item.code_IDX);
     };
 
     const handleSelectCate3 = (item) => {
-        setCate3Form({
-            name: item.code_NM,
-            code: item.code_ID,
-            use: item.code_STS,
+        setCate2Form({
+            cidx: item.code_IDX,
+            pidx: item.parent_IDX,
+            cid: item.code_ID,
+            cnm: item.code_NM,
+            cdep: item.code_DEPTH,
+            csts: item.code_STS,
+            csor: item.code_SORT,
+            ridx: adminUser._c_logIdx
         });
     };
 
@@ -105,18 +135,42 @@ const System_01 = () => {
     // 5) 저장 / 취소
     // =============================
 
-    const saveCate1 = () => alert("대분류 저장 API 연결");
-    const saveCate2 = () => alert("중분류 저장 API 연결");
-    const saveCate3 = () => alert("소분류 저장 API 연결");
+    const saveCate = async (level) => {
+        const paramMap = level === 1 ? cate1Form : level === 2 ? cate2Form : cate3Form;
+        if (!fnAlertReturn(paramMap.cnm, "코드명", '')) return;
+        if (!fnAlertReturn(paramMap.cid, "코드", '')) return;
+
+        // console.log(paramMap);
+        try {
+            setIsLoading(true);
+            const res = await api.post("/code/input", paramMap);
+            const result = res.data;
+
+            if (result === 0) {
+                alert("처리되었습니다.");
+                cancel(level);
+                level === 1 ? loadCategory(level, 0) : loadCategory(level, paramMap.pidx);
+            } else if (result === 4) {
+                alert("중복된 코드명이 있습니다.");
+            } else {
+                alert("등록 실패");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("요청 실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const cancel = (level) => {
         // 레벨 이하 모두 초기화 (의도적 fall-through)
         switch (level) {
-            case 1: setCate1Form({ name: "", code: "", use: 1 });
+            case 1: setCate1Form({ ...defaultCateForm, cdep: 1 });
                 setCate2List([]);
-            case 2: setCate2Form({ name: "", code: "", use: 1 });
+            case 2: setCate2Form({ ...defaultCateForm, cdep: 2 });
                 setCate3List([]);
-            case 3: setCate3Form({ name: "", code: "", use: 1 });
+            case 3: setCate3Form({ ...defaultCateForm, cdep: 3 });
                 break;
             default:
                 break;
@@ -130,7 +184,7 @@ const System_01 = () => {
 
     useEffect(() => {
         loadCategory(1, 0);
-        }, []);
+    }, []);
 
     return (
         <section className="contens">
@@ -143,8 +197,8 @@ const System_01 = () => {
                     form={cate1Form}
                     onSelect={handleSelectCate1}
                     onFormChange={onChange1}
-                    onSave={saveCate1}
-                    onCancel={() =>cancel(1)}
+                    onSave={() => saveCate(1)}
+                    onCancel={() => cancel(1)}
                 />
 
                 {/* 중분류 */}
@@ -155,7 +209,7 @@ const System_01 = () => {
                     form={cate2Form}
                     onSelect={handleSelectCate2}
                     onFormChange={onChange2}
-                    onSave={saveCate2}
+                    onSave={() => saveCate(2)}
                     onCancel={() => cancel(2)}
                 />
 
@@ -167,7 +221,7 @@ const System_01 = () => {
                     form={cate3Form}
                     onSelect={handleSelectCate3}
                     onFormChange={onChange3}
-                    onSave={saveCate3}
+                    onSave={() => saveCate(3)}
                     onCancel={() => cancel(3)}
                 />
 

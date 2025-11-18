@@ -6,7 +6,7 @@ import { isEmpty } from 'common/js/function';
  * @param {string} title - 패널 제목 (예: "대분류", "중분류", "소분류")
  * @param {number} level - 현재 카테고리 레벨 (1 = 대분류, 2 = 중분류, 3 = 소분류)
  * @param {Array<Object>} list - 현재 레벨에 해당하는 카테고리 목록 데이터 (레벨 1이상은 최소 클릭분류값 불러옴 )
- * @param {Object} form - 현재 입력 폼의 상태 (name, code, use 등 입력 값 저장 객체)
+ * @param {Object} form - 현재 입력 폼의 상태 (cnm, cid, csts 등 입력 값 저장 객체)
  * @param {Function} onSelect - 리스트에서 항목을 클릭했을 때 다음 레벨의 카테고리를 로딩하는 기능
  * @param {Function} onFormChange - 입력 폼 값이 변경될 때 실행되는 함수
  * @param {Function} onSave - "추가" 또는 "수정" 버튼 클릭 시 실행되는 함수 (입력한 폼 데이터를 서버로 전송하는 역할)
@@ -22,11 +22,6 @@ const CategoryPanel = ({
     onSave,
     onCancel,
 }) => {
-    if (level === 2) {
-        console.log(form)
-        console.log((list))
-
-    }
     const safeList = isEmpty(list) ? [] : list;
 
     return (
@@ -105,8 +100,8 @@ const CategoryPanel = ({
                             <td colSpan="3">
                                 <input
                                     type="text"
-                                    value={form.name || ""}
-                                    onChange={(e) => onFormChange("name", e.target.value)}
+                                    value={form.cnm || ""}
+                                    onChange={(e) => onFormChange("cnm", e.target.value)}
                                 />
                             </td>
                         </tr>
@@ -116,10 +111,10 @@ const CategoryPanel = ({
                             <td colSpan="3">
                                 <input
                                     type="text"
-                                    value={form.code || ""}
-                                    onChange={(e) => onFormChange("code", e.target.value)}
+                                    value={form.cid || ""}
+                                    onChange={(e) => onFormChange("cid", e.target.value)}
                                     placeholder={level !== 1 && !isEmpty(list) ? "코드 뒤 숫자만 입력해주세요." : ""}
-                                    readOnly={isEmpty(form.code) ? false : true}
+                                    readOnly={form.cidx === 0 ? false : true}
                                 />
                             </td>
                         </tr>
@@ -130,16 +125,16 @@ const CategoryPanel = ({
                                 <label>
                                     <input
                                         type="radio"
-                                        checked={form.use === 1}
-                                        onChange={() => onFormChange("use", 1)}
+                                        checked={form.csts === 1}
+                                        onChange={() => onFormChange("csts", 1)}
                                     />
                                     사용
                                 </label>
                                 <label>
                                     <input
                                         type="radio"
-                                        checked={form.use === 0}
-                                        onChange={() => onFormChange("use", 0)}
+                                        checked={form.csts === 0}
+                                        onChange={() => onFormChange("csts", 0)}
                                     />
                                     미사용
                                 </label>
@@ -154,7 +149,7 @@ const CategoryPanel = ({
                 <a href="#" className="btn btnBlue" onClick={onSave}
                     style={{ display: level !== 1 && isEmpty(list) ? 'none' : 'inline-block' }}
                 >
-                    {isEmpty(form.code) ? '추가' : '수정'}
+                    {form.cidx === 0 ? '추가' : '수정'}
                 </a>
                 <a href="#" className="btn btnWhite" onClick={onCancel}>
                     취소
