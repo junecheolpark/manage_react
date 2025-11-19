@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
+import { api } from "api/api";
 import { LeftEventContext } from "component/layout/HeadLeftLayout";
-import { fnLayerPopupView } from "common/js/function";
+import { useSelector } from "react-redux";
+import { useLoading } from "context/LoadingContext";
+import { fnLayerPopupView, fnSelYear, fnCodeSelList, fnBlank } from 'common/js/function';
+import { fnVacationUsageRate } from 'common/js/code';
 
 import style from './css/system_02.module.css'
 
@@ -17,8 +21,130 @@ const System_02 = () => {
         alert("사용자을(를) 선택해 주세요.");
     };
     //*********************************************************** */
+    const adminUser = useSelector(state => state.authUser);
+    const { setIsLoading } = useLoading();
 
+    //*********************************************************** */
+    //셀렉트 박스 셋팅
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const years = fnSelYear(2025, (currentYear - 2025 + 1), false, '년');
+
+    const [selUserSts, setSelUserSts] = useState([]);
+
+    useEffect(() => {
+        async function loadCodes() {
+            const userSelUserSts = await fnCodeSelList([1, 16, "", "선택", 0, true, 0]);
+
+            setSelUserSts(userSelUserSts);
+        }
+        loadCodes();
+    }, []);
     const [vacationList, setVacationList] = useState([]);
+
+    // ================================
+    // 검색/페이지 state
+    // ================================
+    const [curPage, setCurPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [totalCnt, setTotalCnt] = useState(0);
+
+    const [search, setSearch] = useState({
+        year: currentYear,
+        usersts: 0,
+        schsel: 1,
+        schtxt: ""
+    });
+
+    // ================================
+    // 목록 state
+    // ================================
+    const [vacList, setVacList] = useState([]);
+
+    // ================================
+    // 검색 조건 변경
+    // ================================
+    const searchChange = (e) => {
+        const { name, value } = e.target;
+        setSearch((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // 엔터 검색
+    const enterKey = (e) => {
+        if (e.keyCode === 13) {
+            setCurPage(1);
+            fnVacListView();
+        }
+    };
+
+    // ================================
+    // 1) total 조회 + list 조회
+    // ================================
+    const fnVacListView = async () => {
+        const params = {
+            ltype: 1,
+            page: curPage,
+            psize: pageSize,
+            cidx: adminUser._c_logCIdx,
+            year: parseInt(search.year),
+            usersts: parseInt(search.usersts),
+            schsel: parseInt(search.schsel),
+            schtxt: search.schtxt,
+            orderby: 0,
+            desc: 0
+        };
+console.log(params)
+        try {
+            setIsLoading(true);
+
+            const res = await api.get("/user/VacationTotal", { params });
+            const total = res.data;
+            setTotalCnt(total);
+
+            console.log(total)
+            fnVacList(total, params);
+        } catch (err) {
+            console.error(err);
+            alert("목록 불러오기 실패");
+            setIsLoading(false);
+        }
+    };
+
+    // ================================
+    // 2) 목록 조회
+    // ================================
+    const fnVacList = async (total, paramMap) => {
+        try {
+            const params = { ...paramMap, ltype: 2 };
+            const res = await api.get("/user/vacationList", { params });
+            const resData = res.data;
+
+            console.log(resData)
+            setVacList(resData || []);
+        } catch (err) {
+            alert("목록 불러오기 실패");
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // ================================
+    // page 변경 시 list reload
+    // ================================
+    useEffect(() => {
+        fnVacListView();
+    }, [curPage]);
+
+    // ================================
+    // Row 내부 기능
+    // ================================
+    const handleDetail = (uidx, nm) => {
+        // 기존 onclick="fnSchList(uidx,nm)" 대응
+        console.log("사용자 상세 휴가 내역", uidx, nm);
+        // 필요하면 modal or route 이동 구현
+    };
+
     return (
         <section className="contens">
             {/* 휴가 상세 팝업 */}
@@ -114,21 +240,34 @@ const System_02 = () => {
             {/* 검색 영역 */}
             <section className="schBox">
                 <p>
-                    총 <span id="totalCnt" className="colBlue">0</span>건
+                    총 <span id="totalCnt" className="colBlue">{totalCnt}</span>건
                 </p>
-                <select style={{ width: "120px" }} id="selSchYear">
-                    <option value="0">년도</option>
+                <select id="selSchYear" style={{ width: "120px" }}>
+                    {years.map((y) => (
+                        <option key={y.value} value={y.value}>
+                            {y.label}
+                        </option>
+                    ))}
                 </select>
-                <select style={{ width: "120px" }} id="selStatus">
-                    <option value="17">가입</option>
-                    <option value="18">탈퇴</option>
+                <select name="usersts" id="selStatus" style={{ width: "120px" }} value={search.usersts || 0} onChange={searchChange}>
+                    {selUserSts.map((item) => (
+                        <option key={item.value} value={item.value} data-id={item.id}>
+                            {item.label}
+                        </option>
+                    ))}
                 </select>
                 <select style={{ width: "120px" }} id="selSearch">
                     <option value="1">성명</option>
                     <option value="2">아이디</option>
                 </select>
-                <input type="text" style={{ width: "150px" }} id="txtSearch" />
-                <input type="submit" value="검색" className="btn btnBlue" id="btnSch" />
+                <input
+                    name="schtxt"
+                    style={{ width: "150px" }}
+                    value={search.schtxt}
+                    onChange={searchChange}
+                    onKeyUp={enterKey}
+                />
+                <input type="submit" value="검색" className="btn btnBlue" onClick={() => { setCurPage(1); fnVacListView(); }} />
             </section>
 
             {/* 메인 표 */}
@@ -164,11 +303,62 @@ const System_02 = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td colSpan="8" className="noData">
-                                    검색된 사용자가 없습니다.
-                                </td>
-                            </tr>
+                            {vacList.length === 0 ? (
+                                <tr>
+                                    <td colSpan={8} className="noData">
+                                        검색된 정보가 없습니다.
+                                    </td>
+                                </tr>
+                            ) : (
+                                vacList.map((item, idx) => {
+                                    const nomal = item.nomal_CNT;
+                                    const used = item.use_NOMAL_CNT;
+                                    const percent = nomal === 0 ? 100 : Math.floor(used * 100 / nomal);
+
+                                    return (
+                                        <tr key={idx}>
+                                            <td>
+                                                <input type="checkbox" value={item.user_IDX} />
+                                            </td>
+                                            <td>{fnBlank(item.dept_NM)}</td>
+                                            <td>{fnBlank(item.posi_NM)}</td>
+                                            <td>{item.nm}</td>
+
+                                            {/* 연차 보유 */}
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className={style.nomalCnt}
+                                                    defaultValue={nomal}
+                                                />
+                                            </td>
+
+                                            {/* 사용 */}
+                                            <td className="ftBold">
+                                                <a
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        handleDetail(item.user_IDX, item.nm);
+                                                    }}
+                                                >
+                                                    {used}
+                                                </a>
+                                            </td>
+
+                                            {/* 잔여 */}
+                                            <td>{nomal - used}</td>
+
+                                            {/* 사용률 */}
+                                            <td>
+                                                <span className={fnVacationUsageRate(percent)}>
+                                                    {percent} %
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
                         </tbody>
                     </table>
                 </section>
