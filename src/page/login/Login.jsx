@@ -47,7 +47,7 @@ const Login = () => {
         setIsLoading(true);
         const res = await api.post("/login/login", paramMap);
         const resData = res.data;
-        console.log(resData);
+        // console.log(resData);
 
 
         if (resData === 0) {

@@ -129,7 +129,7 @@ const User_01 = () => {
 
     // 페이지 변경시 
     useEffect(() => {
-        setCurPage(curPage);
+        // setCurPage(curPage);
         fnSortListView();
     }, [curPage]);
 
@@ -232,11 +232,13 @@ const User_01 = () => {
             admintp: parseInt(userView.admin_TP),
             jdate: userView.join_DATE,
             ridx: 1, // 로그인 사용자 idx 등
+            jdate: userView.join_DATE,
+            bdate: userView.birthday,
         };
 
         try {
             setIsLoading(true);
-            const res = await api.post("/user/input",  );
+            const res = await api.post("/user/input",  paramMap);
             const result = res.data;
 
             if (result === 0) {
@@ -597,7 +599,7 @@ const User_01 = () => {
                                         locale={ko}
                                         placeholderText="날짜 선택"
                                         className="cal"
-                                        value={userView.birthday || ""}
+                                        // value={userView.birthday || ""}
                                     />
                                 </td>
                                 <th>입사일자</th>
@@ -614,7 +616,7 @@ const User_01 = () => {
                                         locale={ko}
                                         placeholderText="날짜 선택"
                                         className="cal"
-                                        value={userView.join_DATE || ""}
+                                        // value={userView.join_DATE || ""}
                                     />
                                 </td>
                             </tr>

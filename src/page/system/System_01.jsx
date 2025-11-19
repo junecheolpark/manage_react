@@ -48,19 +48,14 @@ const System_01 = () => {
         try {
             setIsLoading(true);
             const res = await api.get("/code/list", { params: { idx: parentIdx } });
+            const resData = res.data;
 
-            if (level === 1) {
-                setCate1List(res.data);
-                // console.log(res.data); // 값존재
-            }
-
-            if (level === 2) {
-                setCate2List(res.data);
-            }
-
-            if (level === 3) {
-                setCate3List(res.data);
-            }
+            const setters = {
+                1: setCate1List,
+                2: setCate2List,
+                3: setCate3List,
+            };
+            setters[level](resData);
 
         } catch (e) {
             alert("로드 실패");
@@ -214,6 +209,7 @@ const System_01 = () => {
         }
     };
 
+    // 선택한 레벨의 하위 카테고리들을 모두 초기화
     const cancel = (level) => {
         // 레벨 이하 모두 초기화 (의도적 fall-through)
         switch (level) {
