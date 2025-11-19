@@ -185,6 +185,35 @@ const System_01 = () => {
         }
     };
 
+    // 정렬 기능
+    const sortChange = async (level, item, chsort) => {
+
+        const paramMap = {
+            cidx: item.code_IDX, // 현재
+            pidx: item.parent_IDX, // 현재
+            chsort: chsort, // 바뀔
+            sort: item.code_SORT // 현재
+        }
+
+        try {
+            setIsLoading(true);
+
+            const res = await api.post("/code/sort", paramMap);
+
+            if (res.data === 0) {
+                // 정렬 성공 → 해당 level 다시 로드
+                cancel(level - 1)
+                loadCategory(level, item.parent_IDX);
+            } else {
+                alert("정렬 실패");
+            }
+        } catch (err) {
+            alert("요청 실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const cancel = (level) => {
         // 레벨 이하 모두 초기화 (의도적 fall-through)
         switch (level) {
@@ -221,6 +250,7 @@ const System_01 = () => {
                     onFormChange={onChange1}
                     onSave={() => saveCate(1)}
                     onCancel={() => cancel(1)}
+                    sortChange={sortChange}
                 />
 
                 {/* 중분류 */}
@@ -233,6 +263,7 @@ const System_01 = () => {
                     onFormChange={onChange2}
                     onSave={() => saveCate(2)}
                     onCancel={() => cancel(2)}
+                    sortChange={sortChange}
                 />
 
                 {/* 소분류 */}
@@ -245,6 +276,7 @@ const System_01 = () => {
                     onFormChange={onChange3}
                     onSave={() => saveCate(3)}
                     onCancel={() => cancel(3)}
+                    sortChange={sortChange}
                 />
 
                 {/* 대분류 최초 로드 */}

@@ -21,6 +21,7 @@ const CategoryPanel = ({
     onFormChange,
     onSave,
     onCancel,
+    sortChange,
 }) => {
     const safeList = isEmpty(list) ? [] : list;
 
@@ -68,25 +69,44 @@ const CategoryPanel = ({
                                 </tr>
                             )}
 
-                        {(level === 1 ? safeList : safeList.slice(1)).map((item) => (
-                            <tr key={item.code_IDX}>
-                                <td>{item.code_ID}</td>
-                                <td onClick={() => onSelect(item)}>
-                                    <a href="#" className="linkBtn">
-                                        {item.code_NM}
-                                    </a>
-                                </td>
-                                <td>{item.code_STS === 1 ? "사용" : "미사용"}</td>
+                        {(level === 1 ? safeList : safeList.slice(1)).map((item, idx, arr) => {
+                            const isFirst = idx === 0;
+                            const isLast = idx === arr.length - 1;
 
-                                {level > 1 && (
-                                    <td>
-                                        <a href="#"><img src="/images/icon/ic_arrow_u.gif" alt="▲" /></a>
-                                        <br/>
-                                        <a href="#"><img src="/images/icon/ic_arrow_d.gif" alt="▼" /></a>
+                            return (
+                                <tr key={item.code_IDX}>
+                                    <td>{item.code_ID}</td>
+                                    <td onClick={() => onSelect(item)}>
+                                        <a href="#" className="linkBtn">{item.code_NM}</a>
                                     </td>
-                                )}
-                            </tr>
-                        ))}
+                                    <td>{item.code_STS === 1 ? "사용" : "미사용"}</td>
+
+                                    {level > 1 && (
+                                        <td>
+                                            {/* ▲ */}
+                                            {!isFirst ? (
+                                                <a onClick={() => sortChange(level, item, arr[idx - 1].code_SORT)}>
+                                                    <img src="/images/icon/ic_arrow_u.gif" alt="▲" />
+                                                </a>
+                                            ) : (
+                                                <img style={{ opacity: 0.3 }} src="/images/icon/ic_arrow_u.gif" alt="" />
+                                            )}
+
+                                            <br />
+
+                                            {/* ▼ */}
+                                            {!isLast ? (
+                                                <a onClick={() => sortChange(level, item, arr[idx + 1].code_SORT)}>
+                                                    <img src="/images/icon/ic_arrow_d.gif" alt="▼" />
+                                                </a>
+                                            ) : (
+                                                <img style={{ opacity: 0.3 }} src="/images/icon/ic_arrow_d.gif" alt="" />
+                                            )}
+                                        </td>
+                                    )}
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
