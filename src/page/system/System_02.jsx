@@ -124,7 +124,7 @@ const System_02 = () => {
         };
 
         try {
-            const res = await api.post("/schedule/list", params);
+            const res = await api.get("/schedule/list", {params});
             const items = res.data;
 
             const filtered = [];
