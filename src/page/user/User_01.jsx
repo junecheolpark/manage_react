@@ -24,7 +24,7 @@ const User_01 = () => {
     const [selSchUserTp, setSelSchUserTp] = useState([]);
 
     useEffect(() => {
-        async function loadCodes() {
+        const loadCodes = async () => {
             const userSelPosi = await fnCodeSelList([1, 10, '', '선택', 0, true, 0]);
             const userSelDept = await fnCodeSelList([1, 14, '', '선택', 0, true, 0]);
             const userSelSchUserSts = await fnCodeSelList([1, 16, '', '상태', 0, true, 0]);
@@ -65,49 +65,32 @@ const User_01 = () => {
             ltype: 1,
             page: curPage,
             psize: pageSize,
-            usertp: parseInt(search.usertp),
-            usersts: parseInt(search.usersts),
-            admintp: parseInt(search.admintp),
+            usertp: Number(search.usertp),
+            usersts: Number(search.usersts),
+            admintp: Number(search.admintp),
             cidx: 0,
             cnm: "",
             datetp: 0,
             sdate: "",
             edate: "",
-            schsel: parseInt(search.schsel),
+            schsel: Number(search.schsel),
             schtxt: search.schtxt,
             orderby: 0,
             desc: 0,
         };
         try {
             setIsLoading(true);
-            const res = await api.get("/user/listTotal", { params });
-            const total = res.data;
+            const [total, res] = await Promise.all([
+                api.get("/user/listTotal", { params }),
+                api.get("/user/list", { params: { ...params, ltype: 2 } })
+            ]);
 
-            // console.log("총 개수:", total);
-            setTotalCnt(total);
-
-            fnSortList(total, params); // 기존 함수 호출
+            setTotalCnt(total.data);
+            setUserList(res.data || []);
         } catch (err) {
             setIsLoading(false);
             console.error("요청 실패:", err);
             alert("불러오기 실패");
-        }
-    };
-    // 목록 가져오기
-    const fnSortList = async (total, paramMap) => {
-        const params = { ...paramMap, ltype: 2 };
-        try {
-            const res = await api.get("/user/list", { params });
-            const items = res.data;
-
-            if (!items || items.length === 0) {
-                setUserList([]);
-            } else {
-                setUserList(items);
-            }
-        } catch (err) {
-            alert("목록 불러오기 실패");
-            console.error(err);
         } finally {
             setIsLoading(false);
         }
@@ -215,21 +198,21 @@ const User_01 = () => {
         // --- 파라미터 구성 ---
         const paramMap = {
             uidx: selUser,
-            usertp: parseInt(userView.user_TP),
+            usertp: Number(userView.user_TP),
             id: userView.user_ID,
             pw: userView.user_PW,
             nm: userView.nm,
-            pidx: parseInt(userView.posi_IDX),
-            didx: parseInt(userView.dept_IDX),
+            pidx: Number(userView.posi_IDX),
+            didx: Number(userView.dept_IDX),
             phone: userView.phone,
             mobile: userView.mobile,
             email: `${userView.emailId}@${userView.emailDomain}`,
             zcode: userView.zipcode,
             addr: userView.addr,
             addrdt: userView.addr_DETAIL,
-            usersts: parseInt(userView.user_STS),
+            usersts: Number(userView.user_STS),
             cidx: 12,
-            admintp: parseInt(userView.admin_TP),
+            admintp: Number(userView.admin_TP),
             jdate: userView.join_DATE,
             ridx: 1, // 로그인 사용자 idx 등
             jdate: userView.join_DATE,

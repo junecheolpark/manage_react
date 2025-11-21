@@ -72,9 +72,9 @@ const System_02 = () => {
             page: curPage,
             psize: pageSize,
             cidx: adminUser._c_logCIdx,
-            year: parseInt(search.year),
-            usersts: parseInt(search.usersts),
-            schsel: parseInt(search.schsel),
+            year: Number(search.year),
+            usersts: Number(search.usersts),
+            schsel: Number(search.schsel),
             schtxt: search.schtxt,
             orderby: 0,
             desc: 0
@@ -231,7 +231,7 @@ const System_02 = () => {
 
         const paramMap = {
             uidx: uidxStr,
-            year: parseInt(search.year),     // 연도 select 값
+            year: Number(search.year),     // 연도 select 값
             ncnt: ncntStr,
             ridx: adminUser._c_logIdx         // 관리 user idx
         };
