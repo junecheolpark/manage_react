@@ -18,7 +18,8 @@ const System_02 = () => {
     }, [setOnRegister]);
 
     const handleRegister = () => {
-        alert("사용자을(를) 선택해 주세요.");
+        fnVacationInput();
+        // alert("사용자을(를) 선택해 주세요.");
     };
     //*********************************************************** */
     const adminUser = useSelector(state => state.authUser);
@@ -93,7 +94,6 @@ const System_02 = () => {
             orderby: 0,
             desc: 0
         };
-console.log(params)
         try {
             setIsLoading(true);
 
@@ -101,7 +101,6 @@ console.log(params)
             const total = res.data;
             setTotalCnt(total);
 
-            console.log(total)
             fnVacList(total, params);
         } catch (err) {
             console.error(err);
@@ -119,7 +118,6 @@ console.log(params)
             const res = await api.get("/user/vacationList", { params });
             const resData = res.data;
 
-            console.log(resData)
             setVacList(resData || []);
         } catch (err) {
             alert("목록 불러오기 실패");
@@ -136,14 +134,133 @@ console.log(params)
         fnVacListView();
     }, [curPage]);
 
+    useEffect(() => {
+        const initialCheck = {};
+        const initialCount = {};
+
+        vacList.forEach(item => {
+            initialCheck[item.user_IDX] = false;
+            initialCount[item.user_IDX] = item.nomal_CNT;
+        });
+
+        setVacationChecked(initialCheck);
+        setVacationCount(initialCount);
+    }, [vacList]);
     // ================================
     // Row 내부 기능
     // ================================
-    const handleDetail = (uidx, nm) => {
+    const listDetail = (uidx, nm) => {
         // 기존 onclick="fnSchList(uidx,nm)" 대응
         console.log("사용자 상세 휴가 내역", uidx, nm);
         // 필요하면 modal or route 이동 구현
     };
+
+    // ================================
+    // 등록관련 함수
+    // ================================
+
+    // 체크된 사용자: { userIdx: true/false }
+    const [allChecked, setAllChecked] = useState(false);
+    const [vacationChecked, setVacationChecked] = useState({});
+
+    // 연차 입력값: { userIdx: "10" }
+    const [vacationCount, setVacationCount] = useState({});
+
+    const fnCheckAll = (checked) => {
+        setAllChecked(checked);
+
+        // vacationChecked 전체 업데이트
+        const newChecked = {};
+        vacList.forEach(item => {
+            newChecked[item.user_IDX] = checked;
+        });
+        setVacationChecked(newChecked);
+    };
+
+    const fnCheck = (uidx, checked) => {
+        setVacationChecked(prev => ({
+            ...prev,
+            [uidx]: checked,
+        }));
+    };
+
+    // const fnCheck = (uidx, checked) => {
+    //     setVacationChecked(prev => {
+    //         const newState = {
+    //             ...prev,
+    //             [uidx]: checked,
+    //         };
+
+    //         if (vacList.length > 0) {
+    //             const all = vacList.every(item => newState[item.user_IDX]);
+    //             setAllChecked(all);
+    //         }
+
+    //         return newState;
+    //     });
+    // };
+
+    //연차 입력 변경
+    const fnNomalCntChange = (uidx, value) => {
+        setVacationCount(prev => ({
+            ...prev,
+            [uidx]: value,
+        }));
+    };
+
+    // ================================
+    // 등록/수정
+    // ================================
+
+    const fnVacationInput = async () => {
+        console.log(vacationChecked);
+        // 체크된 사용자만 필터링
+        const checkedUsers = Object.keys(vacationChecked).filter(
+            (uidx) => vacationChecked[uidx] === true
+        );
+
+        if (checkedUsers.length === 0) {
+            alert("사용자를 선택해주세요.");
+            return;
+        }
+
+        // uidx 목록
+        const uidxStr = checkedUsers.join(",");
+
+        // 각각의 사용자 연차 입력값
+        const ncntStr = checkedUsers
+            .map(uidx => vacationCount[uidx] || 0)
+            .join(",");
+
+        const paramMap = {
+            uidx: uidxStr,
+            year: parseInt(search.usersts),     // 연도 select 값
+            ncnt: ncntStr,
+            ridx: adminUser._c_logIdx         // 관리 user idx
+        };
+
+    console.log(paramMap)
+    return;
+        try {
+            setIsLoading(true);
+            const res = await api.post("/user/vacationInput", paramMap);
+
+            if (res.data === 0) {
+                alert("처리되었습니다.");
+                setVacationChecked({});
+                setVacationCount({});
+                //fnVacationListView(); // 리스트 새로고침
+            } else {
+                alert("실패");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("요청 실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     return (
         <section className="contens">
@@ -242,7 +359,12 @@ console.log(params)
                 <p>
                     총 <span id="totalCnt" className="colBlue">{totalCnt}</span>건
                 </p>
-                <select id="selSchYear" style={{ width: "120px" }}>
+                <select
+                    name="year"
+                    value={search.year}
+                    onChange={searchChange}
+                    style={{ width: "120px" }}
+                >
                     {years.map((y) => (
                         <option key={y.value} value={y.value}>
                             {y.label}
@@ -287,7 +409,11 @@ console.log(params)
                         <thead>
                             <tr>
                                 <th rowSpan="2">
-                                    <input type="checkbox" />
+                                    <input
+                                        type="checkbox"
+                                        checked={allChecked}
+                                        onChange={(e) => fnCheckAll(e.target.checked)}
+                                    />
                                 </th>
                                 <th colSpan="3">사원정보</th>
                                 <th colSpan="4">연차휴가</th>
@@ -317,8 +443,15 @@ console.log(params)
 
                                     return (
                                         <tr key={idx}>
+                                            {/* 체크박스 */}
                                             <td>
-                                                <input type="checkbox" value={item.user_IDX} />
+                                                <input
+                                                    type="checkbox"
+                                                    checked={vacationChecked[item.user_IDX] || false}
+                                                    onChange={(e) =>
+                                                        fnCheck(item.user_IDX, e.target.checked)
+                                                    }
+                                                />
                                             </td>
                                             <td>{fnBlank(item.dept_NM)}</td>
                                             <td>{fnBlank(item.posi_NM)}</td>
@@ -329,7 +462,10 @@ console.log(params)
                                                 <input
                                                     type="text"
                                                     className={style.nomalCnt}
-                                                    defaultValue={nomal}
+                                                    value={vacationCount[item.user_IDX] ?? nomal}
+                                                    onChange={(e) =>
+                                                        fnNomalCntChange(item.user_IDX, e.target.value)
+                                                    }
                                                 />
                                             </td>
 
@@ -339,7 +475,7 @@ console.log(params)
                                                     href="#"
                                                     onClick={(e) => {
                                                         e.preventDefault();
-                                                        handleDetail(item.user_IDX, item.nm);
+                                                        listDetail(item.user_IDX, item.nm);
                                                     }}
                                                 >
                                                     {used}
