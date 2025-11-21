@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { api } from "api/api";
 import { LeftEventContext } from "component/layout/HeadLeftLayout";
 import { useSelector } from "react-redux";
@@ -9,23 +9,13 @@ import { fnVacationUsageRate } from 'common/js/code';
 import style from './css/system_02.module.css'
 
 const System_02 = () => {
-    // left 버튼 등록 이벤트
-    const { setOnRegister } = useContext(LeftEventContext);
-
-    useEffect(() => {
-        setOnRegister(() => handleRegister);
-        return () => setOnRegister(null);
-    }, [setOnRegister]);
-
-    const handleRegister = () => {
-        fnVacationInput();
-        // alert("사용자을(를) 선택해 주세요.");
-    };
-    //*********************************************************** */
     const adminUser = useSelector(state => state.authUser);
     const { setIsLoading } = useLoading();
 
-    //*********************************************************** */
+    // ================================================================
+    // SECTION 1. 초기 설정
+    // ================================================================
+    
     //셀렉트 박스 셋팅
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -41,11 +31,10 @@ const System_02 = () => {
         }
         loadCodes();
     }, []);
-    const [vacationList, setVacationList] = useState([]);
 
-    // ================================
-    // 검색/페이지 state
-    // ================================
+    // ================================================================
+    // SECTION 2. 검색 / 페이징 / 목록 조회
+    // ================================================================
     const [curPage, setCurPage] = useState(1);
     const [pageSize] = useState(10);
     const [totalCnt, setTotalCnt] = useState(0);
@@ -62,9 +51,7 @@ const System_02 = () => {
     // ================================
     const [vacList, setVacList] = useState([]);
 
-    // ================================
     // 검색 조건 변경
-    // ================================
     const searchChange = (e) => {
         const { name, value } = e.target;
         setSearch((prev) => ({ ...prev, [name]: value }));
@@ -78,9 +65,7 @@ const System_02 = () => {
         }
     };
 
-    // ================================
-    // 1) total 조회 + list 조회
-    // ================================
+    // total 조회 + list 조회
     const fnVacListView = async () => {
         const params = {
             ltype: 1,
@@ -97,74 +82,92 @@ const System_02 = () => {
         try {
             setIsLoading(true);
 
-            const res = await api.get("/user/VacationTotal", { params });
-            const total = res.data;
-            setTotalCnt(total);
+            const [total, res] = await Promise.all([
+                api.get("/user/VacationTotal", { params }),
+                api.get("/user/vacationList", { params: { ...params, ltype: 2 } })
+            ]);
 
-            fnVacList(total, params);
+            setTotalCnt(total.data);
+            setVacList(res.data || []);
         } catch (err) {
             console.error(err);
             alert("목록 불러오기 실패");
             setIsLoading(false);
+        } finally {
+            setIsLoading(false);
         }
+
     };
 
-    // ================================
-    // 2) 목록 조회
-    // ================================
-    const fnVacList = async (total, paramMap) => {
-        try {
-            const params = { ...paramMap, ltype: 2 };
-            const res = await api.get("/user/vacationList", { params });
-            const resData = res.data;
+    useEffect(() => {
+        fnVacListView();
+    }, [curPage]);
 
-            setVacList(resData || []);
+    // ================================================================
+    // SECTION 3. 휴가 상세 팝업 조회
+    // ================================================================
+
+    //휴가 내역리스트
+    const [vacationList, setVacationList] = useState([]);
+    const [vacationUserNm, setVacationUserNm] = useState("");
+    const [vacationCount, setVacationCount] = useState({});
+
+    const fnSchList = async (uidx, nm) => {
+        setIsLoading(true);
+
+        // 팝업에 사용자 이름 반영
+        setVacationUserNm(nm);
+        const params = {
+            uidx: uidx,
+            sdate: `${search.year}-01-01`,
+            edate: `${search.year}-12-31`,
+        };
+
+        try {
+            const res = await api.post("/schedule/list", params);
+            const items = res.data;
+
+            const filtered = [];
+
+            items.forEach(val => {
+                const { reg_DATE, code_NM, sdate, edate, schedule_TP, approve_STS, conts } = val;
+                const vacationTypes = { 27: 1, 29: 0.5, 34: 0 };
+
+                // 승인 + 연차, 반차, 기타휴가만
+                if (approve_STS === 2 && vacationTypes[schedule_TP] !== undefined) {
+                    const dayCnt = vacationTypes[schedule_TP];
+
+                    filtered.push({
+                        applyDate: reg_DATE?.substr(0, 10),
+                        type: code_NM,
+                        startDate: sdate,
+                        endDate: edate,
+                        days: dayCnt,
+                        reason: conts
+                    });
+                }
+            });
+
+            setVacationList(filtered);
+
+            // 팝업 열기
+            fnLayerPopupView("VacationView", true);
+
         } catch (err) {
-            alert("목록 불러오기 실패");
             console.error(err);
+            alert("휴가 내역 조회 실패");
         } finally {
             setIsLoading(false);
         }
     };
 
-    // ================================
-    // page 변경 시 list reload
-    // ================================
-    useEffect(() => {
-        fnVacListView();
-    }, [curPage]);
-
-    useEffect(() => {
-        const initialCheck = {};
-        const initialCount = {};
-
-        vacList.forEach(item => {
-            initialCheck[item.user_IDX] = false;
-            initialCount[item.user_IDX] = item.nomal_CNT;
-        });
-
-        setVacationChecked(initialCheck);
-        setVacationCount(initialCount);
-    }, [vacList]);
-    // ================================
-    // Row 내부 기능
-    // ================================
-    const listDetail = (uidx, nm) => {
-        // 기존 onclick="fnSchList(uidx,nm)" 대응
-        console.log("사용자 상세 휴가 내역", uidx, nm);
-        // 필요하면 modal or route 이동 구현
-    };
-
-    // ================================
-    // 등록관련 함수
-    // ================================
+    // ================================================================
+    // SECTION 4. 체크박스 / 입력값 관리
+    // ================================================================
 
     // 체크된 사용자: { userIdx: true/false }
     const [allChecked, setAllChecked] = useState(false);
     const [vacationChecked, setVacationChecked] = useState({});
-
-    // 연차 입력값: { userIdx: "10" }
-    const [vacationCount, setVacationCount] = useState({});
 
     const fnCheckAll = (checked) => {
         setAllChecked(checked);
@@ -177,28 +180,17 @@ const System_02 = () => {
         setVacationChecked(newChecked);
     };
 
+    // 체크박스 
     const fnCheck = (uidx, checked) => {
-        setVacationChecked(prev => ({
-            ...prev,
-            [uidx]: checked,
-        }));
+        setVacationChecked(prev => {
+            const updated = { ...prev, [uidx]: checked };
+
+            // 전체 체크 여부 계산 (updated 기반)
+            const all = vacList.every(item => updated[item.user_IDX]);
+            setAllChecked(all);
+            return updated;
+        });
     };
-
-    // const fnCheck = (uidx, checked) => {
-    //     setVacationChecked(prev => {
-    //         const newState = {
-    //             ...prev,
-    //             [uidx]: checked,
-    //         };
-
-    //         if (vacList.length > 0) {
-    //             const all = vacList.every(item => newState[item.user_IDX]);
-    //             setAllChecked(all);
-    //         }
-
-    //         return newState;
-    //     });
-    // };
 
     //연차 입력 변경
     const fnNomalCntChange = (uidx, value) => {
@@ -208,12 +200,11 @@ const System_02 = () => {
         }));
     };
 
-    // ================================
-    // 등록/수정
-    // ================================
+    // ================================================================
+    // SECTION 5. 연차 등록 / 수정
+    // ================================================================
 
     const fnVacationInput = async () => {
-        console.log(vacationChecked);
         // 체크된 사용자만 필터링
         const checkedUsers = Object.keys(vacationChecked).filter(
             (uidx) => vacationChecked[uidx] === true
@@ -227,21 +218,25 @@ const System_02 = () => {
         // uidx 목록
         const uidxStr = checkedUsers.join(",");
 
-        // 각각의 사용자 연차 입력값
-        const ncntStr = checkedUsers
-            .map(uidx => vacationCount[uidx] || 0)
-            .join(",");
+        const ncntStr = checkedUsers.map(uidx => {
+            // 입력했으면 입력값
+            if (vacationCount[uidx] !== undefined && vacationCount[uidx] !== "") {
+                return vacationCount[uidx];
+            }
+
+            // 입력 없으면 기존 값 nomal_CNT 사용
+            const info = vacList.find(v => v.user_IDX == uidx);
+            return info ? info.nomal_CNT : 0;
+        }).join(",");
 
         const paramMap = {
             uidx: uidxStr,
-            year: parseInt(search.usersts),     // 연도 select 값
+            year: parseInt(search.year),     // 연도 select 값
             ncnt: ncntStr,
             ridx: adminUser._c_logIdx         // 관리 user idx
         };
-
-    console.log(paramMap)
-    return;
-        try {
+        console.log(paramMap)
+    try {
             setIsLoading(true);
             const res = await api.post("/user/vacationInput", paramMap);
 
@@ -249,7 +244,8 @@ const System_02 = () => {
                 alert("처리되었습니다.");
                 setVacationChecked({});
                 setVacationCount({});
-                //fnVacationListView(); // 리스트 새로고침
+                setAllChecked(false);
+                fnVacListView(); // 리스트 새로고침
             } else {
                 alert("실패");
             }
@@ -261,6 +257,21 @@ const System_02 = () => {
         }
     };
 
+    // ================================================================
+    // SECTION 6. Left 버튼 연동
+    // ================================================================
+    const { setOnRegister } = useContext(LeftEventContext);
+
+    // 최신 상태 반영되는 함수
+    const handleRegister = useCallback(() => {
+        fnVacationInput(); // 내부에서 최신 state 읽음
+    }, [vacationChecked, vacationCount]);
+
+    // context 에 업데이트
+    useEffect(() => {
+        setOnRegister(() => handleRegister);
+        return () => setOnRegister(null);
+    }, [setOnRegister, handleRegister]); 
 
     return (
         <section className="contens">
@@ -282,7 +293,7 @@ const System_02 = () => {
                             </div>
                             <div className="autoSizeLayerTInner">
                                 <h4 className="ui-draggable-handle txtC">
-                                    <span id="vacationNm">홍길동</span>님 휴가사용 현황
+                                    <span id="vacationNm">{vacationUserNm}</span>님 휴가사용 현황
                                 </h4>
                             </div>
                         </div>
@@ -474,8 +485,8 @@ const System_02 = () => {
                                                 <a
                                                     href="#"
                                                     onClick={(e) => {
-                                                        e.preventDefault();
-                                                        listDetail(item.user_IDX, item.nm);
+                                                        // e.preventDefault();
+                                                        fnSchList(item.user_IDX, item.nm);
                                                     }}
                                                 >
                                                     {used}
