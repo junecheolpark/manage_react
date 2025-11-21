@@ -46,9 +46,6 @@ const System_02 = () => {
         schtxt: ""
     });
 
-    // ================================
-    // 목록 state
-    // ================================
     const [vacList, setVacList] = useState([]);
 
     // 검색 조건 변경
@@ -99,6 +96,7 @@ const System_02 = () => {
 
     };
 
+    // 페이지 변경시 
     useEffect(() => {
         fnVacListView();
     }, [curPage]);

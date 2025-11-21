@@ -15,6 +15,10 @@ const User_01 = () => {
     const adminUser = useSelector(state => state.authUser);
     const { setIsLoading } = useLoading();
 
+    // ================================================================
+    // SECTION 1. 초기 설정
+    // ================================================================
+
     // 공통코드 셀렉트박스 셋팅
     const [selPosi, setSelPosi] = useState([]);
     const [selDept, setSelDept] = useState([]);
@@ -42,14 +46,14 @@ const User_01 = () => {
         loadCodes();
     }, []);
 
-    /*************************************** */
-     // 페이지네이션
-     const [curPage, setCurPage] = useState(1); // 현재페이지
-     const [pageSize] = useState(10); // 페이지에 표시할 행 개수
-     const [totalCnt, setTotalCnt] = useState(0); // 총개수
-     /****************************************************/
-     // 사용사 리스트 불러오기
-    const [userList, setUserList] = useState([]);
+    // ================================================================
+    // SECTION 2. 검색 / 페이징 / 목록 조회
+    // ================================================================
+
+    // 페이지네이션
+    const [curPage, setCurPage] = useState(1); // 현재페이지
+    const [pageSize] = useState(10); // 페이지에 표시할 행 개수
+    const [totalCnt, setTotalCnt] = useState(0); // 총개수
 
     const [search, setSearch] = useState({
         usertp: 0,
@@ -59,7 +63,24 @@ const User_01 = () => {
         schtxt: "",
     });
 
-    // 카운트 가져오기
+    // 사용사 리스트 불러오기
+    const [userList, setUserList] = useState([]);
+
+    // 검색 조건 변경 처리
+    const searchChange = (e) => {
+        const { name, value } = e.target;
+        setSearch((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // 검색 엔터키 처리
+    const enterKey = (e) => {
+        if (e.keyCode === 13) {
+            setCurPage(1);
+            fnSortListView();
+        }
+    };
+
+    // total 조회 + list 조회
     const fnSortListView = async () => {
         const params = {
             ltype: 1,
@@ -96,20 +117,6 @@ const User_01 = () => {
         }
     };
 
-    // 검색 엔터키 처리
-    const enterKey = (e) => {
-        if (e.keyCode === 13) {
-            setCurPage(1);
-            fnSortListView();
-        }
-    };
-
-    // 검색 조건 변경 처리
-    const searchChange = (e) => {
-        const { name, value } = e.target;
-        setSearch((prev) => ({ ...prev, [name]: value }));
-    };
-
     // 페이지 변경시 
     useEffect(() => {
         // setCurPage(curPage);
@@ -141,13 +148,17 @@ const User_01 = () => {
         admin_NM: "",
     };
 
+    // ================================================================
+    // SECTION 3. 상세 조회
+    // ================================================================
+
     const [userView, setUserView] = useState(defaultUserView);
     const [selUser, setSelUser] = useState(0); // 클릭 셀 활성화 여부
     const [isEditable, setIsEditable] = useState(false); // 수정버튼 활성화 여부
 
     // 사용자 상세 보기
     const fnUserView = async (uidx) => {
-        
+
         const params = {
             uidx: uidx,
         };
@@ -177,6 +188,10 @@ const User_01 = () => {
         }
         // alert(`사용자 상세 보기: ${uidx}`);
     }
+
+    // ================================================================
+    // SECTION 4. 회원 등록 / 수정 / 취소
+    // ================================================================
 
     const userViewChange = (e) => {
         const { name, value } = e.target;
@@ -221,7 +236,7 @@ const User_01 = () => {
 
         try {
             setIsLoading(true);
-            const res = await api.post("/user/input",  paramMap);
+            const res = await api.post("/user/input", paramMap);
             const result = res.data;
 
             if (result === 0) {
@@ -249,71 +264,10 @@ const User_01 = () => {
         setSelUser(0);
         setIsEditable(false);
     }
-    //***************** 주소 검색 ********************** */
-    const layerRef = useRef(null);
 
-    const fnAddrSchClose = () => {
-        if (layerRef.current) layerRef.current.style.display = "none";
-    };
-
-    const fnAddrSch = () => {
-        new window.daum.Postcode({
-            oncomplete: function (data) {
-                let addr = "";
-                let extraAddr = "";
-
-                if (data.userSelectedType === "R") addr = data.roadAddress;
-                else addr = data.jibunAddress;
-
-                if (data.userSelectedType === "R") {
-                    if (data.bname && /[동|로|가]$/g.test(data.bname)) extraAddr += data.bname;
-                    if (data.buildingName && data.apartment === "Y")
-                        extraAddr += (extraAddr ? ", " + data.buildingName : data.buildingName);
-                    if (extraAddr) extraAddr = " (" + extraAddr + ")";
-                }
-
-                setUserView((prev) => ({
-                    ...prev,
-                    zipcode: data.zonecode,
-                    addr: addr + extraAddr,
-                }));
-                document.getElementById("txtAddrDetail").focus();
-
-                if (layerRef.current) layerRef.current.style.display = "none";
-            },
-            width: "100%",
-            height: "100%",
-            maxSuggestItems: 5,
-        }).embed(layerRef.current);
-
-        if (layerRef.current) {
-            layerRef.current.style.display = "block";
-            initLayerPosition();
-        }
-    };
-
-    const initLayerPosition = () => {
-        if (!layerRef.current) return;
-        const width = 300;
-        const height = 400;
-        const borderWidth = 2;
-        layerRef.current.style.width = width + "px";
-        layerRef.current.style.height = height + "px";
-        layerRef.current.style.border = borderWidth + "px solid";
-        layerRef.current.style.left =
-            ((window.innerWidth - width) / 2 - borderWidth) + "px";
-        layerRef.current.style.top =
-            ((window.innerHeight - height) / 2 - borderWidth) + "px";
-    };
-
-    useEffect(() => {
-        const script = document.createElement("script");
-        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-        script.async = true;
-        document.body.appendChild(script);
-    }, []);
-
-    /*************************************** */
+    // ================================================================
+    // SECTION 5.  이메일 자동 검색 처리
+    // ================================================================
 
 
     // 이메일 입력시 자동완성 검색
@@ -377,14 +331,78 @@ const User_01 = () => {
         return () => document.removeEventListener("mousedown", clickOutside);
     }, []);
 
-    // 4️⃣ 선택 시 입력창에 반영
+    // 선택 시 입력창에 반영
     const handleSelect = (label) => {
         if (label === "검색된 이메일이 없습니다.") return;
         userViewChange({ target: { name: "emailDomain", value: label } });
         setEmailOpen(false);
     };
 
+    // ================================================================
+    // SECTION 6. 주소 검색
+    // ================================================================
+    const layerRef = useRef(null);
 
+    const fnAddrSchClose = () => {
+        if (layerRef.current) layerRef.current.style.display = "none";
+    };
+
+    const fnAddrSch = () => {
+        new window.daum.Postcode({
+            oncomplete: function (data) {
+                let addr = "";
+                let extraAddr = "";
+
+                if (data.userSelectedType === "R") addr = data.roadAddress;
+                else addr = data.jibunAddress;
+
+                if (data.userSelectedType === "R") {
+                    if (data.bname && /[동|로|가]$/g.test(data.bname)) extraAddr += data.bname;
+                    if (data.buildingName && data.apartment === "Y")
+                        extraAddr += (extraAddr ? ", " + data.buildingName : data.buildingName);
+                    if (extraAddr) extraAddr = " (" + extraAddr + ")";
+                }
+
+                setUserView((prev) => ({
+                    ...prev,
+                    zipcode: data.zonecode,
+                    addr: addr + extraAddr,
+                }));
+                document.getElementById("txtAddrDetail").focus();
+
+                if (layerRef.current) layerRef.current.style.display = "none";
+            },
+            width: "100%",
+            height: "100%",
+            maxSuggestItems: 5,
+        }).embed(layerRef.current);
+
+        if (layerRef.current) {
+            layerRef.current.style.display = "block";
+            initLayerPosition();
+        }
+    };
+
+    const initLayerPosition = () => {
+        if (!layerRef.current) return;
+        const width = 300;
+        const height = 400;
+        const borderWidth = 2;
+        layerRef.current.style.width = width + "px";
+        layerRef.current.style.height = height + "px";
+        layerRef.current.style.border = borderWidth + "px solid";
+        layerRef.current.style.left =
+            ((window.innerWidth - width) / 2 - borderWidth) + "px";
+        layerRef.current.style.top =
+            ((window.innerHeight - height) / 2 - borderWidth) + "px";
+    };
+
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
 
     return (
         <section className="contens">
@@ -534,7 +552,7 @@ const User_01 = () => {
                                 <th>
                                     <span className="colRed">{selUser === 0 ? "*" : ""}</span> 비밀번호
                                 </th>
-                                <td><input type="text" name="user_PW" value={userView.user_PW || ""} 
+                                <td><input type="text" name="user_PW" value={userView.user_PW || ""}
                                     placeholder={selUser > 0 ? "비밀번호 변경시 입력" : ""} onChange={userViewChange} /></td>
                             </tr>
                             <tr>
@@ -582,7 +600,7 @@ const User_01 = () => {
                                         locale={ko}
                                         placeholderText="날짜 선택"
                                         className="cal"
-                                        // value={userView.birthday || ""}
+                                    // value={userView.birthday || ""}
                                     />
                                 </td>
                                 <th>입사일자</th>
@@ -599,7 +617,7 @@ const User_01 = () => {
                                         locale={ko}
                                         placeholderText="날짜 선택"
                                         className="cal"
-                                        // value={userView.join_DATE || ""}
+                                    // value={userView.join_DATE || ""}
                                     />
                                 </td>
                             </tr>
@@ -627,8 +645,8 @@ const User_01 = () => {
                                                 }}
                                                 style={{ width: "100%", padding: "8px" }}
                                             />
-                                            <div id="emailSchResult" className={style.emailSchResult}                                                
-                                            style={{
+                                            <div id="emailSchResult" className={style.emailSchResult}
+                                                style={{
                                                     display: emailOpen && filtered.length > 0 ? "block" : "none",
                                                 }}
                                             >
