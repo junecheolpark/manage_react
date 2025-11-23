@@ -9,13 +9,12 @@ import { fnVacationUsageRate } from 'common/js/code';
 import style from './css/system_02.module.css'
 
 const System_02 = () => {
-    const adminUser = useSelector(state => state.authUser);
-    const { setIsLoading } = useLoading();
-
     // ================================================================
     // SECTION 1. 초기 설정
     // ================================================================
-    
+    const adminUser = useSelector(state => state.authUser);
+    const { setIsLoading } = useLoading();
+
     //셀렉트 박스 셋팅
     const today = new Date();
     const currentYear = today.getFullYear();

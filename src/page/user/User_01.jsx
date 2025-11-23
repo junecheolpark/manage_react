@@ -12,12 +12,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import style from './css/user_01.module.css';
 
 const User_01 = () => {
-    const adminUser = useSelector(state => state.authUser);
-    const { setIsLoading } = useLoading();
-
     // ================================================================
     // SECTION 1. 초기 설정
     // ================================================================
+    const adminUser = useSelector(state => state.authUser);
+    const { setIsLoading } = useLoading();
 
     // 공통코드 셀렉트박스 셋팅
     const [selPosi, setSelPosi] = useState([]);
@@ -122,7 +121,10 @@ const User_01 = () => {
         // setCurPage(curPage);
         fnSortListView();
     }, [curPage]);
-
+    
+    // ================================================================
+    // SECTION 3. 상세 조회
+    // ================================================================
     const defaultUserView = {
         user_IDX: 0,
         nm: "",
@@ -147,10 +149,6 @@ const User_01 = () => {
         emailDomain: "",
         admin_NM: "",
     };
-
-    // ================================================================
-    // SECTION 3. 상세 조회
-    // ================================================================
 
     const [userView, setUserView] = useState(defaultUserView);
     const [selUser, setSelUser] = useState(0); // 클릭 셀 활성화 여부
@@ -464,29 +462,27 @@ const User_01 = () => {
                                         </td>
                                     </tr>
                                 ) : (
-                                    userList.map((user) => (
+                                    userList.map((item) => (
                                         <tr
-                                            key={user.user_IDX}
-                                            data-uidx={user.user_IDX}
-                                            data-cidx={user.company_IDX || 0}
-                                            onClick={() => fnUserView(user.user_IDX)} // 클릭 시 상세 보기
-                                            className={`${user.user_STS === 18 ? "colRed" : ""} 
-                                            ${selUser === user.user_IDX ? "selRow" : ""}`}
+                                            key={item.user_IDX}
+                                            className={`${item.user_STS === 18 ? "colRed" : ""} 
+                                            ${selUser === item.user_IDX ? "selRow" : ""}`}
+                                            onClick={() => fnUserView(item.user_IDX)} // 클릭 시 상세 보기
                                         >
                                             <td>
-                                                <p className="text-ellipsis" title={user.company_NM}>
-                                                    {user.company_NM || "-"}
+                                                <p className="text-ellipsis" title={item.company_NM}>
+                                                    {item.company_NM || "-"}
                                                 </p>
                                             </td>
                                             <td>
-                                                <p className="text-ellipsis" title={user.nm}>
-                                                    {user.nm || "-"}
+                                                <p className="text-ellipsis" title={item.nm}>
+                                                    {item.nm || "-"}
                                                 </p>
                                             </td>
-                                            <td>{user.posi_NM || "-"}</td>
-                                            <td>{user.user_ID}</td>
-                                            <td>{user.mobile || user.phone || "-"}</td>
-                                            <td>{user.user_STS_NM}</td>
+                                            <td>{item.posi_NM || "-"}</td>
+                                            <td>{item.user_ID}</td>
+                                            <td>{item.mobile || item.phone || "-"}</td>
+                                            <td>{item.user_STS_NM}</td>
                                         </tr>
                                     ))
                                 )}

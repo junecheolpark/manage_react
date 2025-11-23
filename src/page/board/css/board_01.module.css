@@ -5,3 +5,8 @@
 .ck-editor__editable {min-height: 100px;}
 
 .boardFootBtn {position: relative; float: right; margin-top: -45px;}
+
+:global(.ck-editor__editable_inline) {
+    min-height: 300px !important;
+    overflow-y: auto !important;
+}
