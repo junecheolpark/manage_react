@@ -182,3 +182,14 @@ export const isEmpty = (value) => {
   }
   return false;
 };
+
+// 파일 용량 단위
+export const fnFileSize = (size) => {
+  if (size < 1024) return size + ' Byte';
+  size /= 1024;
+  if (size < 1024) return size.toFixed(2).replace('.00', '') + ' KB';
+  size /= 1024;
+  if (size < 1024) return size.toFixed(2).replace('.00', '') + ' MB';
+  size /= 1024;
+  return size.toFixed(2).replace('.00', '') + ' GB';
+}

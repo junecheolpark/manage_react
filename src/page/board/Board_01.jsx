@@ -3,6 +3,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
+import { fnFileSize } from 'common/js/function';
 import Pagination from 'component/Pagination';
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
@@ -98,6 +99,34 @@ const Board_01 = () => {
             setIsLoading(false);
             console.error("요청 실패:", err);
             alert("불러오기 실패");
+        } 
+    };
+
+    const [fileList, setFileList] = useState([]);
+    const [totalFileSize, setTotalFileSize] = useState(0);
+    // fileList 조회
+    const fnBoardFileList = async (bidx) => {
+        try {
+            const params = {
+                bidx: Number(bidx),
+                fidx: 0,
+                ftp: 0
+            };
+
+            const res = await api.post("/board/fileList", params);
+            const items = res.data || [];
+
+            setFileList(items);
+
+            const total = items.reduce((sum, file) => {
+                return sum + fnFileSize(file.file_SIZE, file.fileType);
+            }, 0);
+
+            setTotalFileSize(total);
+
+        } catch (err) {
+            alert("파일 목록 불러오기 실패");
+            console.error(err);
         } finally {
             setIsLoading(false);
         }
@@ -126,7 +155,6 @@ const Board_01 = () => {
     // const [isEditable, setIsEditable] = useState(false); // 수정버튼 활성화 여부
 
     const fnBoardView = async (bidx) => {
-        console.log(bidx)
         const params = {
             bidx: bidx,
         };
