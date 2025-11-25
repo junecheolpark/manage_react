@@ -13,6 +13,8 @@ import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
+import FileDropDown  from 'component/FileDropDown';
+// import FileDropDown  from 'component/FileDropDown2';
 import style from './css/board_01.module.css'
 const Board_01 = () => {
     
@@ -99,7 +101,9 @@ const Board_01 = () => {
             setIsLoading(false);
             console.error("요청 실패:", err);
             alert("불러오기 실패");
-        } 
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const [fileList, setFileList] = useState([]);
@@ -171,12 +175,12 @@ const Board_01 = () => {
             });
 
             setSelBoard(bidx); // 선택된 셀
+
+            fnBoardFileList(bidx);
         } catch (err) {
             alert("목록 불러오기 실패");
             console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
+        } 
     }
 
     // ================================================================
@@ -197,6 +201,51 @@ const Board_01 = () => {
         setSelBoard(0);
     }
 
+
+      // ================================================================
+      //테스트 
+    const [newFiles, setNewFiles] = useState([]);      // 새 업로드할 파일
+    const [delFiles, setDelFiles] = useState([]);      // 삭제할 DB파일(file_IDX)
+
+    // DB에 기존 파일 목록 불러오기
+useEffect(() => {
+    if(boardView.board_IDX > 0) {
+        loadFileList();
+    }
+}, [boardView.board_IDX]);
+
+const loadFileList = async () => {
+    const res = await api.post("/board/fileList", {
+        bidx: boardView.board_IDX
+    });
+
+    const list = res.data.map((f) => ({
+        file_IDX: f.file_IDX,
+        realName: f.real_FILE_NM,
+        size: f.file_SIZE,
+        status: "정상"
+    }));
+    setFileList(list);
+};
+
+
+// 파일 추가
+const handleAddFiles = (files) => {
+    setNewFiles(prev => [...prev, ...files]);
+};
+
+// 파일 삭제
+const handleDeleteFile = (file) => {
+    // DB에 존재하는 파일 삭제
+    if (file.file_IDX) {
+        setDelFiles(prev => [...prev, file.file_IDX]);
+        setFileList(prev => prev.filter(f => f.file_IDX !== file.file_IDX));
+    } 
+    // 새로 추가된 파일 삭제
+    else {
+        setNewFiles(prev => prev.filter(f => f !== file));
+    }
+};
     return (
         <section className="contens">
             {/* 검색 영역 */}
@@ -288,7 +337,7 @@ const Board_01 = () => {
                                                     "-"
                                                 ) : (
                                                     <img
-                                                        src="/resources/images/icon/ic_file.png"
+                                                        src="/images/icon/ic_file.png"
                                                         alt="첨부파일 있음"
                                                         height="16"
                                                     />
@@ -360,7 +409,13 @@ const Board_01 = () => {
 
                     {/* 파일 업로드 */}
                     <div className="ry_fileUploadBody">
-                        <div className="DivScrollY" id="fileDragBody">
+                        <FileDropDown
+                            files={[...fileList, ...newFiles]}
+                            onAddFiles={handleAddFiles}
+                            onDeleteFile={handleDeleteFile}
+                        />
+                        {/* <FileDropDown folder="board" maxSizeMB={500} /> */}
+                        {/* <div className={`${style.DivScrollY} DivScrollY`}  >
                             <table className="tableList">
                                 <thead>
                                     <tr>
@@ -371,10 +426,9 @@ const Board_01 = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {/* 파일 목록 렌더링 위치 */}
                                 </tbody>
                             </table>
-                        </div>
+                        </div> */}
 
                         <div id="fileFoot">
                             <div className="filebox mgTB10">

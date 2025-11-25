@@ -6,6 +6,8 @@
 
 .boardFootBtn {position: relative; float: right; margin-top: -45px;}
 
+.DivScrollY { background: url(/public/images/filedropdown/file_drag_bg.png) no-repeat center center; max-height: 200px; }
+
 :global(.ck-editor__editable_inline) {
     min-height: 300px !important;
     overflow-y: auto !important;
