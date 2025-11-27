@@ -1,19 +1,21 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { fnFileSize } from 'common/js/function';
 
-function formatFileSize(bytes) {
-    if (bytes >= 1024 ** 3) return (bytes / 1024 ** 3).toFixed(2) + " GB";
-    if (bytes >= 1024 ** 2) return (bytes / 1024 ** 2).toFixed(2) + " MB";
-    if (bytes >= 1024) return (bytes / 1024).toFixed(2) + " KB";
-    return bytes + " Byte";
-}
-
-function FileDropDown({ folder = "uploadfile", maxSizeMB = 500 }) {
+function FileDropDown({
+    serverFiles,           // 기존 저장된 파일 (정상)
+    newFiles,              // 새로 추가한 파일 (대기)
+    onChangeFiles,         // newFiles를 변경할 때 사용하는 setter
+    onRemoveServerFile,    // 기존 파일 삭제 콜백
+    onRemoveNewFile        // 새 파일 삭제 콜백
+}) {
     const style = {
         dragArea: {
             width: "100%",
             border: "2px dashed #ccc",
             cursor: "pointer",
             background: "url(/images/filedropdown/file_drag_bg.png) no-repeat center center",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
             maxHeight: "200px",
         },
 
@@ -42,96 +44,90 @@ function FileDropDown({ folder = "uploadfile", maxSizeMB = 500 }) {
             color: "white",
         }
     };
-    const [fileList, setFileList] = useState([]);
-    const [totalSize, setTotalSize] = useState(0);
-    const fileInputRef = useRef(null);
+
+    const [dragging, setDragging] = useState(false);
 
     // allowed types
     const blockedExt = ['exe', 'bat', 'sh', 'java', 'jsp', 'asp', 'aspx', 'php', 'html', 'js', 'css', 'xml'];
-
+    // 개별 파일 업로드 최대 용량 (MB)
+    const MAX_FILE_SIZE_MB = 500;
+    // 드래그 후
     const handleDrop = (e) => {
         e.preventDefault();
         const files = e.dataTransfer.files;
         addFiles(files);
+        setDragging(false); // UI 원래 상태로 복구
     };
 
-    const handleFileSelect = (e) => {
-        addFiles(e.target.files);
+    // 드래그 영역 위에 파일이 올라온 상태
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setDragging(true); // border 색 변경 등 UI 변경 트리거
     };
 
-    const addFiles = (files) => {
-        let newFiles = [];
-        let newTotalSize = totalSize;
+    // 드래그가 영역 밖으로 나간 상태
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setDragging(false); // UI 원래 상태로 복구
+    };
 
-        for (let file of files) {
-            const ext = file.name.split('.').pop().toLowerCase();
-            const sizeMB = file.size / 1024 / 1024;
+    // newFiles에 파일을 추가하기 전에 검사하는 로직
+    const addFiles = (fileList) => {
 
+        const arr = Array.from(fileList);
+
+        const addedFiles = [];
+
+        for (let i = 0; i < arr.length; i++) {
+            const file = arr[i];
+            const fileName = file.name;
+
+            // 1) 파일명에서 확장자 추출
+            const parts = fileName.split(".");
+            const ext = parts[parts.length - 1].toLowerCase();
+
+            // 2) 확장자 금지 검사
             if (blockedExt.includes(ext)) {
-                alert("업로드 불가능한 파일입니다.");
+                alert(
+                    `업로드 할 수 없는 확장자 입니다.\n\n[${ext}]\n\n이미지, 문서, 압축파일을 업로드해 주세요.`
+                );
                 continue;
             }
 
-            if (sizeMB > maxSizeMB) {
-                alert(`파일 용량 초과. (${maxSizeMB}MB 제한)`);
+            // 3) 파일 사이즈 검사
+            const fileSizeMB = file.size / 1024 / 1024;
+            if (fileSizeMB > MAX_FILE_SIZE_MB) {
+                alert(
+                    `파일 업로드 최대 용량 ${MAX_FILE_SIZE_MB}MB 초과\n(${fileSizeMB.toFixed(
+                        2
+                    )}MB)`
+                );
                 continue;
             }
 
-            newTotalSize += sizeMB;
-
-            newFiles.push({
-                file,
-                name: file.name,
-                size: file.size,
-                sizeText: formatFileSize(file.size),
-                status: "대기",
-            });
+            // 4) 위 조건을 모두 통과한 안전한 파일만 push
+            addedFiles.push(file);
         }
 
-        setTotalSize(newTotalSize);
-        setFileList((prev) => [...prev, ...newFiles]);
-    };
-
-    const removeFile = (index) => {
-        const removed = fileList[index];
-        setTotalSize((prev) => prev - removed.size / 1024 / 1024);
-        setFileList((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const uploadFiles = async () => {
-        if (fileList.length === 0) return;
-
-        const formData = new FormData();
-        fileList.forEach((f) => {
-            formData.append("uploadFiles", f.file);
-        });
-        formData.append("utype", "multi");
-        formData.append("ufolder", folder);
-
-        try {
-            const res = await fetch("/common/fileupload", {
-                method: "POST",
-                body: formData,
-            });
-
-            const data = await res.json();
-            console.log(data);
-
-            alert("업로드 완료");
-
-        } catch (err) {
-            console.error(err);
-            alert("업로드 실패");
+        // 5) 기존 newFiles와 합쳐서 반영
+        if (addedFiles.length > 0) {
+            onChangeFiles([...newFiles, ...addedFiles]);
         }
     };
+
 
     return (
         <div
-            className={`${style.dragArea} DivScrollY`}
+            className="DivScrollY"
             id="fileDragBody"
             onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
-            onClick={() => fileInputRef.current.click()}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            style={{
+                ...style.dragArea,                 // 기존 스타일 유지
+                backgroundImage: serverFiles.length === 0 && newFiles.length === 0 ? "url(/images/filedropdown/file_drag_bg.png)" : "none",
+                backgroundColor: dragging ? "#eeeef7" : "white"   // 드래그 상태에 따라 동적 변경
+            }}
         >
             <table className="tableList">
                 <thead>
@@ -143,41 +139,40 @@ function FileDropDown({ folder = "uploadfile", maxSizeMB = 500 }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {fileList.length === 0 ? (
-                        <tr>
-                            <td colSpan="4" style={{ textAlign: "center", padding: "30px" }}>
-                                <span style={{ color: "#0077cc" }}>파일 추가</span> 또는 드래그 하세요.
+                    {/* 서버에 저장된 기존 파일 (정상) */}
+                    {serverFiles.map((f) => (
+                        <tr key={f.file_IDX}>
+                            <td>
+                                <a href={`/common/filedownload?fpt=${f.file_PATH}&fnm=${f.file_NM}&rfnm=${f.real_FILE_NM}`}>
+                                    {f.real_FILE_NM}
+                                </a>
+                            </td>
+                            <td>{fnFileSize(f.file_SIZE)}</td>
+                            <td>정상</td>
+                            <td>
+                                <a href="#filedel" class="ry_btnFileDel" onClick={() => onRemoveServerFile(f)}>
+                                    <img src="/images/filedropdown/btn_rowdel.png" alt="삭제" />
+                                </a>
                             </td>
                         </tr>
-                    ) : (
-                        fileList.map((item, i) => (
-                            <tr key={i}>
-                                <td>{item.name}</td>
-                                <td>{item.sizeText}</td>
-                                <td>{item.status}</td>
-                                <td>
-                                    <button className={style.delBtn} onClick={() => removeFile(i)}>
-                                        -
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    )}
+                    ))}
+
+                    {/* 새로 추가된 파일 (대기 상태) */}
+                    {newFiles.map((file, idx) => (
+                        <tr key={idx} style={{ background: "#eef7ff" }}>
+                            <td>{file.name}</td>
+                            <td>{fnFileSize(file.size)}</td>
+                            <td>대기</td>
+                            <td>
+                                <a href="#filedel" class="ry_btnFileDel" onClick={() => onRemoveNewFile(idx)}>
+                                    <img src="/images/filedropdown/btn_rowdel.png" alt="삭제" />
+                                </a>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
-            <input
-                type="file"
-                multiple
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleFileSelect}
-            />
-
-            {/* <div className={style.bottomArea}>
-                총 용량: {totalSize.toFixed(2)}MB / 제한 {maxSizeMB}MB
-                <button onClick={uploadFiles} className={style.uploadBtn}>업로드</button>
-            </div> */}
         </div>
     );
 }

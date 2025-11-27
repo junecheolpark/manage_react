@@ -3,8 +3,8 @@ import { useLocation, useParams } from "react-router-dom";
 import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
-import { fnFileSize } from 'common/js/function';
 import Pagination from 'component/Pagination';
+import { fnFileSize, fnDeleteMsg } from 'common/js/function';
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -13,11 +13,11 @@ import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
-import FileDropDown  from 'component/FileDropDown';
+import FileDropDown from 'component/FileDropDown';
 // import FileDropDown  from 'component/FileDropDown2';
 import style from './css/board_01.module.css'
 const Board_01 = () => {
-    
+
     // ================================================================
     // SECTION 1. 초기 설정
     // ================================================================
@@ -106,36 +106,6 @@ const Board_01 = () => {
         }
     };
 
-    const [fileList, setFileList] = useState([]);
-    const [totalFileSize, setTotalFileSize] = useState(0);
-    // fileList 조회
-    const fnBoardFileList = async (bidx) => {
-        try {
-            const params = {
-                bidx: Number(bidx),
-                fidx: 0,
-                ftp: 0
-            };
-
-            const res = await api.post("/board/fileList", params);
-            const items = res.data || [];
-
-            setFileList(items);
-
-            const total = items.reduce((sum, file) => {
-                return sum + fnFileSize(file.file_SIZE, file.fileType);
-            }, 0);
-
-            setTotalFileSize(total);
-
-        } catch (err) {
-            alert("파일 목록 불러오기 실패");
-            console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     // 페이지 변경시 
     useEffect(() => {
         // setCurPage(curPage);
@@ -180,7 +150,7 @@ const Board_01 = () => {
         } catch (err) {
             alert("목록 불러오기 실패");
             console.error(err);
-        } 
+        }
     }
 
     // ================================================================
@@ -197,55 +167,69 @@ const Board_01 = () => {
 
     // 취소 버튼 클릭시 데이터 초기화
     const fnBoardCancel = () => {
-        setBoardView(defaultBoardView);
-        setSelBoard(0);
+        setBoardView(defaultBoardView); // 뷰 초기화
+        setSelBoard(0); //선택취소
+
+        setServerFiles([]);            // 서버 파일 비우기
+        setNewFiles([]);            // 대기 파일 비우기
+        setDeletedServerFiles([]);  // 삭제 예정 목록 비우기
     }
 
 
-      // ================================================================
-      //테스트 
-    const [newFiles, setNewFiles] = useState([]);      // 새 업로드할 파일
-    const [delFiles, setDelFiles] = useState([]);      // 삭제할 DB파일(file_IDX)
+    // ================================================================
+    // SECTION 5. 파일 목록 조회 / 등록 / 삭제
+    // ================================================================
+    // 1) 서버에 이미 저장된 파일들 (수정 화면)
+    const [serverFiles, setServerFiles] = useState([]); // 기존 파일 목록
+    const [deletedServerFiles, setDeletedServerFiles] = useState([]); // 지울 기존 파일들
 
-    // DB에 기존 파일 목록 불러오기
-useEffect(() => {
-    if(boardView.board_IDX > 0) {
-        loadFileList();
-    }
-}, [boardView.board_IDX]);
+    // 2) 새로 추가한 파일들 (아직 서버에 안 올라간)
+    const [newFiles, setNewFiles] = useState([]);
 
-const loadFileList = async () => {
-    const res = await api.post("/board/fileList", {
-        bidx: boardView.board_IDX
-    });
+    // fileList 조회
+    const fnBoardFileList = async (bidx) => {
+        try {
+            const params = {
+                bidx: Number(bidx),
+                fidx: 0,
+                ftp: 0
+            };
 
-    const list = res.data.map((f) => ({
-        file_IDX: f.file_IDX,
-        realName: f.real_FILE_NM,
-        size: f.file_SIZE,
-        status: "정상"
-    }));
-    setFileList(list);
-};
+            const res = await api.post("/board/fileList", params);
+            const items = res.data || [];
 
+            setServerFiles(items);
 
-// 파일 추가
-const handleAddFiles = (files) => {
-    setNewFiles(prev => [...prev, ...files]);
-};
+        } catch (err) {
+            alert("파일 목록 불러오기 실패");
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-// 파일 삭제
-const handleDeleteFile = (file) => {
-    // DB에 존재하는 파일 삭제
-    if (file.file_IDX) {
-        setDelFiles(prev => [...prev, file.file_IDX]);
-        setFileList(prev => prev.filter(f => f.file_IDX !== file.file_IDX));
-    } 
-    // 새로 추가된 파일 삭제
-    else {
-        setNewFiles(prev => prev.filter(f => f !== file));
-    }
-};
+    // 파일 추가
+    const handleAddFiles = (files) => {
+        setNewFiles(prev => [...prev, ...files]);
+    };
+
+    // 기존 파일 목록에서 삭제 버튼 눌렀을 때
+    const handleRemoveServerFile = (file) => {
+        if (!fnDeleteMsg(3)) return;
+
+        // 화면 목록에서 제거
+        setServerFiles((prev) => prev.filter((f) => f.file_IDX !== file.file_IDX));
+
+        // 삭제 요청 목록에 추가 (DB에서 삭제할 예정)
+        setDeletedServerFiles((prev) => [...prev, file]);
+    };
+
+    // 새로 추가된 (대기) 파일 삭제 버튼 눌렀을 때
+    const handleRemoveNewFile = (index) => {
+        // 해당 인덱스를 newFiles에서 제거
+        setNewFiles((prev) => prev.filter((_, i) => i !== index));
+    };
+
     return (
         <section className="contens">
             {/* 검색 영역 */}
@@ -287,7 +271,7 @@ const handleDeleteFile = (file) => {
                     style={{ width: "120px" }}
                 />
 
-                <input type="text" name="schrnm" placeholder="작성자" style={{ width: "120px" }} onChange={searchChange}/>
+                <input type="text" name="schrnm" placeholder="작성자" style={{ width: "120px" }} onChange={searchChange} />
                 <input type="text" name="schtxt" placeholder="제목" style={{ width: "250px" }} onChange={searchChange} onKeyUp={enterKey} />
                 <input type="submit" id="btnSch" value="검색" className="btn btnBlue" />
             </section>
@@ -382,7 +366,7 @@ const handleDeleteFile = (file) => {
                                 </td>
                             </tr>
                             <tr>
-                                <td colSpan="4" style={{ padding: "10px 0", height: "304px"}}>
+                                <td colSpan="4" style={{ padding: "10px 0", height: "304px" }}>
                                     <CKEditor
                                         editor={ClassicEditor}
                                         data={boardView.conts}
@@ -410,25 +394,12 @@ const handleDeleteFile = (file) => {
                     {/* 파일 업로드 */}
                     <div className="ry_fileUploadBody">
                         <FileDropDown
-                            files={[...fileList, ...newFiles]}
-                            onAddFiles={handleAddFiles}
-                            onDeleteFile={handleDeleteFile}
+                            serverFiles={serverFiles}               // 기존 파일
+                            newFiles={newFiles}                     // 새로 추가된 파일
+                            onChangeFiles={setNewFiles}             // FileDropDown에서 파일이 변경되면 호출됨
+                            onRemoveServerFile={handleRemoveServerFile} // 기존파일 삭제
+                            onRemoveNewFile={handleRemoveNewFile}       // 새파일 삭제
                         />
-                        {/* <FileDropDown folder="board" maxSizeMB={500} /> */}
-                        {/* <div className={`${style.DivScrollY} DivScrollY`}  >
-                            <table className="tableList">
-                                <thead>
-                                    <tr>
-                                        <th>파일명</th>
-                                        <th>용량</th>
-                                        <th>상태</th>
-                                        <th>삭제</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div> */}
 
                         <div id="fileFoot">
                             <div className="filebox mgTB10">
@@ -446,9 +417,9 @@ const handleDeleteFile = (file) => {
 
                     {/* 하단 버튼 */}
                     <div className={style.boardFootBtn}>
-                        <a href="#"  className="btn btnBlue" id="btnInput">{selBoard === 0 ? "등록" : "수정"}</a>
-                        <a href="#"  className="btn btnRed" id="btnDelete" style={{ display: "none" }}>삭제</a>
-                        <a href="#"  className="btn btnWhite" id="btnCancel" onClick={fnBoardCancel}>취소</a>
+                        <a href="#" className="btn btnBlue" id="btnInput">{selBoard === 0 ? "등록" : "수정"}</a>
+                        <a href="#" className="btn btnRed" id="btnDelete" style={{ display: "none" }}>삭제</a>
+                        <a href="#" className="btn btnWhite" id="btnCancel" onClick={fnBoardCancel}>취소</a>
                     </div>
                 </section>
             </section>

@@ -193,3 +193,25 @@ export const fnFileSize = (size) => {
   size /= 1024;
   return size.toFixed(2).replace('.00', '') + ' GB';
 }
+
+// 삭제 메시지 출력 함수 (React)
+export const fnDeleteMsg = (pType) => {
+  let message = "";
+
+  switch (pType) {
+    case 1:
+      message = "삭제할 경우 데이터가 모두 삭제되며\n\n복구가 불가능합니다.\n\n삭제 하시겠습니까?";
+      break;
+    case 2:
+      message = "삭제할 경우 데이터 및 첨부파일이 모두 삭제되며\n\n복구가 불가능합니다.\n\n삭제 하시겠습니까?";
+      break;
+    case 3:
+      message = "삭제 하시겠습니까?";
+      break;
+    default:
+      message = "삭제 하시겠습니까?";
+      break;
+  }
+
+  return window.confirm(message);
+};
