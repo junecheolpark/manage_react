@@ -361,7 +361,7 @@ const Board_01 = () => {
     // 파일 추가
     const fnAddFiles = (e) => {
         e.preventDefault();
-        const files = e.dataTransfer.files;
+        const files = e.target.files;
         setNewFiles(prev => [...prev, ...files]);
     };
 
