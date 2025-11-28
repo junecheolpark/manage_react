@@ -52,7 +52,7 @@ function FileDropDown({
     // 개별 파일 업로드 최대 용량 (MB)
     const MAX_FILE_SIZE_MB = 500;
     // 드래그 후
-    const handleDrop = (e) => {
+    const fnDrop = (e) => {
         e.preventDefault();
         const files = e.dataTransfer.files;
         addFiles(files);
@@ -60,13 +60,13 @@ function FileDropDown({
     };
 
     // 드래그 영역 위에 파일이 올라온 상태
-    const handleDragOver = (e) => {
+    const fnDragOver = (e) => {
         e.preventDefault();
         setDragging(true); // border 색 변경 등 UI 변경 트리거
     };
 
     // 드래그가 영역 밖으로 나간 상태
-    const handleDragLeave = (e) => {
+    const fnDragLeave = (e) => {
         e.preventDefault();
         setDragging(false); // UI 원래 상태로 복구
     };
@@ -120,9 +120,9 @@ function FileDropDown({
         <div
             className="DivScrollY"
             id="fileDragBody"
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
+            onDrop={fnDrop}
+            onDragOver={fnDragOver}
+            onDragLeave={fnDragLeave}
             style={{
                 ...style.dragArea,                 // 기존 스타일 유지
                 backgroundImage: serverFiles.length === 0 && newFiles.length === 0 ? "url(/images/filedropdown/file_drag_bg.png)" : "none",
@@ -150,7 +150,7 @@ function FileDropDown({
                             <td>{fnFileSize(f.file_SIZE)}</td>
                             <td>정상</td>
                             <td>
-                                <a href="#filedel" class="ry_btnFileDel" onClick={() => onRemoveServerFile(f)}>
+                                <a href="#filedel" className="ry_btnFileDel" onClick={() => onRemoveServerFile(f)}>
                                     <img src="/images/filedropdown/btn_rowdel.png" alt="삭제" />
                                 </a>
                             </td>
@@ -164,7 +164,7 @@ function FileDropDown({
                             <td>{fnFileSize(file.size)}</td>
                             <td>대기</td>
                             <td>
-                                <a href="#filedel" class="ry_btnFileDel" onClick={() => onRemoveNewFile(idx)}>
+                                <a href="#filedel" className="ry_btnFileDel" onClick={() => onRemoveNewFile(idx)}>
                                     <img src="/images/filedropdown/btn_rowdel.png" alt="삭제" />
                                 </a>
                             </td>

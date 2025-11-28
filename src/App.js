@@ -76,8 +76,8 @@ function App() {
                 <Route path="/schedule/01" element={<Schedule_01 />}></Route>
                 <Route path="/user/01" element={<User_01 />}></Route>
                 <Route path="/board/01" element={<Board_01 />}></Route>
-                <Route path="/board/02" element={<Board_02 />}></Route>
-                <Route path="/board/03" element={<Board_03 />}></Route>
+                <Route path="/board/02" element={<Board_01 />}></Route>
+                <Route path="/board/03" element={<Board_01 />}></Route>
                 <Route path="/system/01" element={<System_01 />}></Route>
                 <Route path="/system/02" element={<System_02 />}></Route>
               </Route>

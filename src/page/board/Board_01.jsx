@@ -79,7 +79,7 @@ const Board_01 = () => {
             ltype: 1,
             page: curPage,
             psize: pageSize,
-            midx: 10,
+            midx: masterBoardIdx,
             schd1: search.schd1,
             schd2: search.schd2,
             schrnm: search.schrnm,
@@ -109,7 +109,7 @@ const Board_01 = () => {
     useEffect(() => {
         // setCurPage(curPage);
         fnSortListView();
-    }, [curPage]);
+    }, [curPage, masterBoardIdx]);
 
     // ================================================================
     // SECTION 3. 상세 조회
@@ -137,7 +137,7 @@ const Board_01 = () => {
             setIsLoading(true);
             const res = await api.get("/board/view", { params });
             const resData = res.data;
-            console.log(resData)
+            // console.log(resData)
 
 
             setBoardView({
@@ -168,7 +168,7 @@ const Board_01 = () => {
     
     // 게시글 저장
     const fnBoardInput = async (regCnt) => {
-        // 등록 모드일 때 제목, 내용 필수 검사
+        //  게시글 유효성 체크
         if (regCnt !== 1) {
             if (!fnAlertReturn(boardView.subj, "제목", '')) return;
 
@@ -190,14 +190,17 @@ const Board_01 = () => {
 
         try {
             setIsLoading(true);
-            // 1) 게시글 등록/수정
+            // 게시글 등록/수정
             const res = await api.post("/board/input", params);
             const result = res.data;
-            if (result === 0) {
+
+            // 조회수가 아니고, 게시글 등록 성공시
+            if (result === 0 && regCnt == 0) {
+                await fnBoardFileDelete(); // 파일 삭제 처리
+                await fnBoardFileInput(); // 새 파일 서버, DB 등록
+                alert("처리 되었습니다.");
                 fnBoardCancel();
                 fnSortListView();
-            } else {
-                alert("실패");
             }
 
         } catch (err) {
@@ -206,35 +209,6 @@ const Board_01 = () => {
         } finally {
             setIsLoading(false);
         }
-
-
-        /*/
-        // 2) 기존 파일 삭제 요청
-        for (const f of deletedServerFiles) {
-            await api.post("/board/fileDelete", {
-                deltp: 0,
-                bidx,
-                fidx: f.file_IDX,
-                fnm: f.file_NM,
-                furl: f.file_PATH,
-                didx: userIdx
-            });
-        }
-
-        // 3) 새 파일 업로드
-        if (newFiles.length > 0) {
-            const formData = new FormData();
-            newFiles.forEach(f => formData.append("uploadFiles", f));
-            formData.append("utype", "multi");
-            formData.append("ufolder", "uploadfile");
-            formData.append("bidx", bidx);
-
-            await axios.post("/common/fileupload", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-        }
-
-         /**/
     }
 
     // 게시물 삭제
@@ -287,12 +261,12 @@ const Board_01 = () => {
     // ================================================================
     // SECTION 5. 파일 목록 조회 / 등록 / 삭제
     // ================================================================
-    
-    // 1) 서버에 이미 저장된 파일들 (수정 화면)
+   
+    // 서버에 이미 저장된 파일들 (수정 화면)
     const [serverFiles, setServerFiles] = useState([]); // 기존 파일 목록
     const [deletedServerFiles, setDeletedServerFiles] = useState([]); // 지울 기존 파일들
 
-    // 2) 새로 추가한 파일들 (아직 서버에 안 올라간)
+    // 새로 추가한 파일들 (아직 서버에 안 올라간)
     const [newFiles, setNewFiles] = useState([]);
 
     // fileList 조회
@@ -317,13 +291,82 @@ const Board_01 = () => {
         }
     };
 
+    // 새 파일 실제 업로드
+    const fnBoardFileServerInput = async () => {
+        const formData = new FormData();
+        newFiles.forEach(f => formData.append("uploadFiles", f));
+        formData.append("utype", "multi");
+        formData.append("ufolder", "board");
+
+        const fileRes = await api.post("/common/fileupload", formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        });
+
+        return fileRes.data.fileDTOList;
+    }
+
+    // 새 파일 DB 등록
+    const fnBoardFileInput = async () => {
+        try {
+            if (newFiles.length === 0) return;
+            const uploadedFiles = await fnBoardFileServerInput();
+            if (!uploadedFiles || uploadedFiles.length === 0) return;
+
+            for (const f of uploadedFiles) {
+                if (f.upload_ST !== 1) {
+                    alert("일부파일 저장중 오류가 발생했습니다.");
+                    continue;
+                }
+                const params = {
+                    bidx: boardView.board_IDX,
+                    fidx: 0,
+                    ftp: 1,
+                    fpath: f.file_PATH,
+                    fnm: f.file_NM,
+                    rfnm: f.real_FILE_NM,
+                    fsize: Number(f.file_SIZE),
+                    ridx: adminUser._c_logIdx
+                };
+                await api.post("/board/fileInput", params);
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("게시글파일 저장 실패");
+        }
+    }
+
+    // 기존 첨부파일 삭제
+    const fnBoardFileDelete = async () => {
+        try {
+            if (deletedServerFiles.length === 0) return;
+
+            for (const f of deletedServerFiles) {
+                const params = {
+                    furl: unescape(f.file_PATH),
+                    fnm: unescape(f.file_NM),
+                    deltp: 0,
+                    bidx: boardView.board_IDX,
+                    fidx: Number(f.file_IDX),
+                    didx: adminUser._c_logIdx
+                };
+                await api.post("/board/fileDelete", params);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("게시글파일 삭제 실패");
+        }
+    }
+
     // 파일 추가
-    const handleAddFiles = (files) => {
+    const fnAddFiles = (e) => {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
         setNewFiles(prev => [...prev, ...files]);
     };
 
     // 기존 파일 목록에서 삭제 버튼 눌렀을 때
-    const handleRemoveServerFile = (file) => {
+    const fnRemoveServerFile = (file) => {
         if (!fnDeleteMsg(3)) return;
 
         // 화면 목록에서 제거
@@ -334,7 +377,7 @@ const Board_01 = () => {
     };
 
     // 새로 추가된 (대기) 파일 삭제 버튼 눌렀을 때
-    const handleRemoveNewFile = (index) => {
+    const fnRemoveNewFile = (index) => {
         // 해당 인덱스를 newFiles에서 제거
         setNewFiles((prev) => prev.filter((_, i) => i !== index));
     };
@@ -495,19 +538,19 @@ const Board_01 = () => {
                     </table>
 
                     {/* 파일 업로드 */}
-                    <div className="ry_fileUploadBody">
+                    <div className="fileUploadBody">
                         <FileDropDown
                             serverFiles={serverFiles}               // 기존 파일
                             newFiles={newFiles}                     // 새로 추가된 파일
                             onChangeFiles={setNewFiles}             // FileDropDown에서 파일이 변경되면 호출됨
-                            onRemoveServerFile={handleRemoveServerFile} // 기존파일 삭제
-                            onRemoveNewFile={handleRemoveNewFile}       // 새파일 삭제
+                            onRemoveServerFile={fnRemoveServerFile} // 기존파일 삭제
+                            onRemoveNewFile={fnRemoveNewFile}       // 새파일 삭제
                         />
 
                         <div id="fileFoot">
                             <div className="filebox mgTB10">
-                                <label htmlFor="ry_file">파일추가</label>
-                                <input type="file" id="ry_file" multiple />
+                                <label htmlFor="j_file">파일추가</label>
+                                <input type="file" id="j_file" multiple onChange={fnAddFiles}/>
                                 <a href="#download" id="fileDownBtn" className="btn btnWhite" style={{ display: "none" }}>
                                     파일전체 다운로드
                                 </a>
