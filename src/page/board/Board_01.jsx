@@ -4,7 +4,7 @@ import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
 import Pagination from 'component/Pagination';
-import { fnFileSize, fnDeleteMsg } from 'common/js/function';
+import { fnFileSize, fnDeleteMsg, fnAlertReturn, isEmpty } from 'common/js/function';
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -14,7 +14,6 @@ import { ko } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 
 import FileDropDown from 'component/FileDropDown';
-// import FileDropDown  from 'component/FileDropDown2';
 import style from './css/board_01.module.css'
 const Board_01 = () => {
 
@@ -29,13 +28,13 @@ const Board_01 = () => {
 
     const params = new URLSearchParams(urlSearch);
     const bidx = Number(params.get("bidx"));
-
+   
     const boardMap = {
         "01": 10,
         "02": 11,
     };
-
-    const masterBoardIdx = boardMap[boardType] ?? 12;
+    const arrPath = window.location.pathname.split("/");
+    const masterBoardIdx = boardMap[arrPath[2]] ?? 12;
 
     useEffect(() => {
         if (bidx) fnBoardView(bidx);
@@ -119,7 +118,8 @@ const Board_01 = () => {
         board_IDX: 0,
         subj: "",
         conts: "",
-        reg_NM: "",
+        reg_IDX: adminUser._c_logIdx,
+        reg_NM: adminUser._c_logNm,
         reg_DATE: "",
         rcnt: 0,
     };
@@ -133,10 +133,11 @@ const Board_01 = () => {
             bidx: bidx,
         };
         try {
+            await fnBoardInput(1); // 조회수
             setIsLoading(true);
             const res = await api.get("/board/view", { params });
             const resData = res.data;
-            // console.log(resData)
+            console.log(resData)
 
 
             setBoardView({
@@ -152,9 +153,8 @@ const Board_01 = () => {
             console.error(err);
         }
     }
-
     // ================================================================
-    // SECTION 4. 등록 / 수정 / 취소
+    // SECTION 4. 등록 / 수정 / 취소 / 삭제
     // ================================================================
 
     const boardViewChange = (e) => {
@@ -164,6 +164,114 @@ const Board_01 = () => {
             [name]: value,
         }));
     };
+
+    
+    // 게시글 저장
+    const fnBoardInput = async (regCnt) => {
+        // 등록 모드일 때 제목, 내용 필수 검사
+        if (regCnt !== 1) {
+            if (!fnAlertReturn(boardView.subj, "제목", '')) return;
+
+            if (isEmpty(boardView.conts) === "") {
+                alert("내용을 입력해주세요");
+                return;
+            }
+        }
+
+        const params = {
+            bidx : boardView.board_IDX,
+            mbidx: masterBoardIdx,
+            rnm: boardView.reg_NM,             
+            rcnt: regCnt, // 조회수 업데이트인지 구분
+            subj: boardView.subj,
+            conts: boardView.conts,
+            ridx: boardView.reg_IDX
+        };
+
+        try {
+            setIsLoading(true);
+            // 1) 게시글 등록/수정
+            const res = await api.post("/board/input", params);
+            const result = res.data;
+            if (result === 0) {
+                fnBoardCancel();
+                fnSortListView();
+            } else {
+                alert("실패");
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("게시글 저장 실패");
+        } finally {
+            setIsLoading(false);
+        }
+
+
+        /*/
+        // 2) 기존 파일 삭제 요청
+        for (const f of deletedServerFiles) {
+            await api.post("/board/fileDelete", {
+                deltp: 0,
+                bidx,
+                fidx: f.file_IDX,
+                fnm: f.file_NM,
+                furl: f.file_PATH,
+                didx: userIdx
+            });
+        }
+
+        // 3) 새 파일 업로드
+        if (newFiles.length > 0) {
+            const formData = new FormData();
+            newFiles.forEach(f => formData.append("uploadFiles", f));
+            formData.append("utype", "multi");
+            formData.append("ufolder", "uploadfile");
+            formData.append("bidx", bidx);
+
+            await axios.post("/common/fileupload", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+        }
+
+         /**/
+    }
+
+    // 게시물 삭제
+    const fnBoardDelete = async () => {
+        if (!fnDeleteMsg(1)) return;
+        try {
+
+            const paramMap = {
+                deltp: 1,                      // 삭제 구분
+                bidx: boardView.board_IDX,     // 게시글 ID
+                didx: adminUser._c_logIdx,     // 작업한 사용자 ID
+            };
+
+            setIsLoading(true);
+
+            const res = await api.post("/board/delete", paramMap);
+            const result = res.data;
+
+            if (result === 0) {
+                alert("처리 되었습니다.");
+
+                fnBoardCancel();
+                fnSortListView();
+                setCurPage(1);
+
+            } else {
+                alert("실패");
+            }
+
+        } catch (e) {
+            alert("처리 중 오류가 발생했습니다.");
+            console.error(e);
+        } finally {
+            // 7) 로딩 종료
+            setIsLoading(false);
+        }
+    }
 
     // 취소 버튼 클릭시 데이터 초기화
     const fnBoardCancel = () => {
@@ -179,6 +287,7 @@ const Board_01 = () => {
     // ================================================================
     // SECTION 5. 파일 목록 조회 / 등록 / 삭제
     // ================================================================
+    
     // 1) 서버에 이미 저장된 파일들 (수정 화면)
     const [serverFiles, setServerFiles] = useState([]); // 기존 파일 목록
     const [deletedServerFiles, setDeletedServerFiles] = useState([]); // 지울 기존 파일들
@@ -369,23 +478,17 @@ const Board_01 = () => {
                                 <td colSpan="4" style={{ padding: "10px 0", height: "304px" }}>
                                     <CKEditor
                                         editor={ClassicEditor}
-                                        data={boardView.conts}
+                                        data={boardView.conts || ""}
                                         config={{
                                             placeholder: "내용을 입력해 주세요",
-                                            ckfinder: {
-                                                uploadUrl: "/common/uploadImgOne"
-                                            }
+                                            ckfinder: { uploadUrl: "/common/uploadImgOne" }
                                         }}
                                         onChange={(event, editor) => {
                                             const data = editor.getData();
                                             boardViewChange({
-                                                target: {
-                                                    name: "conts",
-                                                    value: data
-                                                }
+                                                target: { name: "conts", value: data }
                                             });
-                                        }}
-                                    />
+                                        }} />
                                 </td>
                             </tr>
                         </tbody>
@@ -417,8 +520,8 @@ const Board_01 = () => {
 
                     {/* 하단 버튼 */}
                     <div className={style.boardFootBtn}>
-                        <a href="#" className="btn btnBlue" id="btnInput">{selBoard === 0 ? "등록" : "수정"}</a>
-                        <a href="#" className="btn btnRed" id="btnDelete" style={{ display: "none" }}>삭제</a>
+                        <a href="#" className="btn btnBlue" id="btnInput" onClick={() => fnBoardInput(0)}>{selBoard === 0 ? "등록" : "수정"}</a>
+                        <a href="#" className="btn btnRed" id="btnDelete" style={{ display: selBoard === 0 ? "none" : "inline-block" }} onClick={fnBoardDelete}>삭제</a>
                         <a href="#" className="btn btnWhite" id="btnCancel" onClick={fnBoardCancel}>취소</a>
                     </div>
                 </section>
