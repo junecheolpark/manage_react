@@ -2,6 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { LeftEventContext } from "component/layout/HeadLeftLayout";
 import { fnLayerPopupView, fnSelYear } from 'common/js/function';
 
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 // import './css/report_01.css'
 import style from './css/report_01.module.css'
 
@@ -150,6 +153,8 @@ const Report_01 = () => {
 
     //*********************************************************** */
 
+    const [beforeWeek, setBeforeWeek] = useState("");
+    const [nextWeek, setNextWeek] = useState("");
     return (
         <section className="contens">
             {/* 팝업 */}
@@ -190,7 +195,57 @@ const Report_01 = () => {
                                             <th colSpan="2">금주 추진사항</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td className="tdCenter">
+                                                <select name="selectItem" className="selectItem" defaultValue="12">
+                                                    <option value="12" data-id="">
+                                                        준철 포트폴리오
+                                                    </option>
+                                                </select>
+                                            </td>
+
+                                            <td >
+                                                <div style={{ width: "455px" }}>
+                                                    <CKEditor
+                                                        editor={ClassicEditor}
+                                                        id={`beforeWeek`}
+                                                        className={`beforeWeek ${style.txtWeek}`}
+                                                        config={{
+                                                            placeholder: "내용을 입력해 주세요",
+                                                            ckfinder: { uploadUrl: "/common/uploadImgOne" }
+                                                        }}
+                                                        data={beforeWeek || ""}
+                                                        onChange={(event, editor) => {
+                                                            const data = editor.getData();
+                                                            setBeforeWeek(data);
+                                                        }}
+                                                    />
+                                                </div>
+                                            </td>
+
+                                            <td >
+                                                <div style={{ width: "455px" }}>
+                                                    <CKEditor
+                                                        editor={ClassicEditor}
+                                                        id={`nextWeek`}
+                                                        className={`nextWeek ${style.txtWeek}`}
+                                                        config={{
+                                                            placeholder: "내용을 입력해 주세요",
+                                                            ckfinder: { uploadUrl: "/common/uploadImgOne" }
+                                                        }}
+                                                        data={nextWeek || ""}
+                                                        onChange={(event, editor) => {
+                                                            const data = editor.getData();
+                                                            setNextWeek(data);
+                                                        }}
+                                                    />
+                                                </div>
+                                            </td>
+
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
 

@@ -277,8 +277,7 @@ const Board_01 = () => {
                 fidx: 0,
                 ftp: 0
             };
-
-            const res = await api.post("/board/fileList", params);
+            const res = await api.get("/board/fileList", {params});
             const items = res.data || [];
 
             setServerFiles(items);
