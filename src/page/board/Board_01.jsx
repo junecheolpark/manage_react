@@ -97,7 +97,6 @@ const Board_01 = () => {
             setTotalCnt(total.data);
             setBoardList(res.data || []);
         } catch (err) {
-            setIsLoading(false);
             console.error("요청 실패:", err);
             alert("불러오기 실패");
         } finally {

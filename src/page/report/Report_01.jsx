@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { api } from "api/api";
-import { LeftEventContext } from "component/layout/HeadLeftLayout";
+import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
-import { fnLayerPopupView, fnSelYear } from 'common/js/function';
+import { LeftEventContext } from "component/layout/HeadLeftLayout";
+import { fnLayerPopupView, fnSelYear, isEmpty } from 'common/js/function';
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -14,20 +15,9 @@ const Report_01 = () => {
     // ================================================================
     // SECTION 1. 초기 설정 (주차 관련)
     // ================================================================
-   
-    // left 버튼 등록 이벤트
-    const { setOnRegister } = useContext(LeftEventContext);
+    const adminUser = useSelector(state => state.authUser);
+    const { setIsLoading } = useLoading();
 
-    useEffect(() => {
-        setOnRegister(() => handleRegister);
-        return () => setOnRegister(null);
-    }, [setOnRegister]);
-
-    const handleRegister = () => {
-        alert("Report01 등록 로직 실행!");
-        fnLayerPopupView('WeekLayerPopUp', true);
-    };
-    
     //셀렉트 박스 셋팅
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -57,7 +47,7 @@ const Report_01 = () => {
         setWeek(newWeeks[0].week);
     };
 
-    //*********************주차 관련******************************** */
+    //*********************주차 계산, 월/연차 관련**************************** */
     
     const weekChange = (e) => {
         setWeek(Number(e.target.value));
@@ -69,7 +59,7 @@ const Report_01 = () => {
         const friday = new Date(current); // 금요일
         friday.setDate(monday.getDate() + 4);
 
-        const startYearDay = new Date(`1/1/${monday.getFullYear()}`); // 해당 연도의 1월 1일
+        const startYearDay = new Date(monday.getFullYear(), 0, 1); // 0 = 1월
         const diffDay = (monday - startYearDay) / 86400000; // 일수 차이 계산 (1일 = 1000 * 60 * 60 * 24 = 86400000)
         let weekDay = parseInt(diffDay / 7) + 1; // 몇 번째 주인지 계산
         if (monday.getDay() < startYearDay.getDay()) weekDay += 1; // 연초(1월 1일)가 월요일이 아닐 때 주 계산
@@ -108,6 +98,7 @@ const Report_01 = () => {
 
     // 주 변경 (전주 / 다음주 버튼)
     const updateWeek = (weekTp) => {
+        if (weekArr.length === 0) return;
         const prevWeek = weekTp === -1 && month === '01' && week === weekArr[1].week; //  이전버튼 클릭시 month 1월2째주라면
         const nextWeek = weekTp === 1 && month === '01' && week === weekArr[0].week; //  다음버튼 클릭시 month 1월1째주라면
         const weekNum = prevWeek ? weekArr[0].week : nextWeek ? weekArr[1].week : week + weekTp; // 1월에 12월이 껴있을수 있기때문에 비교처리
@@ -165,29 +156,54 @@ const Report_01 = () => {
     const [totalCnt, setTotalCnt] = useState(0);
 
     const [workList, setWorkList] = useState([]);
+    const [workInputList, setWorkInputList] = useState([]);
     const [beforeWeek, setBeforeWeek] = useState("");
     const [nextWeek, setNextWeek] = useState("");
 
     
 
     const fnWorkWeekList = async () => {
-        const paramMap = {
-            preyyyy: parseInt(weekDate[0]),
-            prewwork: parseInt(weekDate[3]),
-            yyyy: parseInt($('#selYear').val()),
-            wwork: parseInt($('#selWeek').val()),
+        const wIdx = weekArr.findIndex(item => item.week === week);
+        let preWeek = 0;
+        let preYear = year; // 기본은 현재 연도
+
+        if (wIdx === 0) {
+            const check = month === '01'; // 이번달이 1월이라면
+            const prevMonth = check ? '12' : String(Number(month) - 1).padStart(2, "0"); // 이전 달 
+            preYear = check ? year - 1 : year; // 이전 연도
+
+            const newWeeks = getWeeksOfMonth(preYear, prevMonth);
+            preWeek = newWeeks[newWeeks.length - 1].week;
+        } else {
+            preWeek = weekArr[wIdx - 1].week;
+        }
+        
+        const params = {
+            preyyyy: Number(preYear),
+            prewwork: Number(preWeek),
+            yyyy: Number(year),
+            wwork: Number(week),
             uidx: 0
         }
         try {
             setIsLoading(true);
 
-            const res = await api.post(api.get("/weekWork/list", params));
+            const [res, resInput] = await Promise.all([
+                api.get("/weekWork/list", { params }),
+                api.get("/weekWork/list", { params: { ...params, uidx: adminUser._c_logIdx } })
+            ]);
 
             setWorkList(res.data || []);
+            // setWorkInputList(resInput.data || []);
+            const resInputData = resInput.data;
+
+            if (resInputData.length > 0) {
+                setBeforeWeek(resInputData[0].prev_CONTS || "");
+                setNextWeek(resInputData[0].now_CONTS || "");
+            }
         } catch (err) {
             console.error(err);
             alert("목록 불러오기 실패");
-            setIsLoading(false);
         } finally {
             setIsLoading(false);
         }
@@ -195,8 +211,24 @@ const Report_01 = () => {
     };
 
     useEffect(() => {
+        if (isEmpty(weekArr)) return; //값이 바인딩되기전에는 리턴
         fnWorkWeekList();
-    }, []);
+    }, [week]);
+
+    // ================================================================
+    // SECTION 6. Left 버튼 연동
+    // ================================================================
+    const { setOnRegister } = useContext(LeftEventContext);
+
+    const handleRegister = () => {
+        fnLayerPopupView('WeekLayerPopUp', true);
+    };
+
+    useEffect(() => {
+        setOnRegister(() => handleRegister);
+        return () => setOnRegister(null);
+    }, [setOnRegister]);
+
     return (
         <section className="contens">
             {/* 팝업 */}
@@ -377,11 +409,34 @@ const Report_01 = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td colSpan="4" className="none">
-                                    등록된 내용이 없습니다.
-                                </td>
-                            </tr>
+                            {workList.length > 0 ? (
+                                workList.map((val, i) => (
+                                    <tr key={val.week_WORK_CONTS_IDX}>
+
+                                        {(i === 0 || workList[i - 1].company_IDX !== val.company_IDX) && (
+                                            <td rowSpan={val.row_CNT} className="rLine tdCenter">
+                                                {val.company_NM}
+                                            </td>
+                                        )}
+
+                                        <td className="rLine tdCenter">
+                                            {val.user_NM}
+                                        </td>
+
+                                        <td className={`rLine tdVTop ${!val.prev_CONTS ? style.noData : ""}`}>
+                                            <div dangerouslySetInnerHTML={{ __html: val.prev_CONTS }} />
+                                        </td>
+
+                                        <td className={`tdVTop ${!val.now_CONTS ? style.noData : ""}`}>
+                                            <div dangerouslySetInnerHTML={{ __html: val.now_CONTS }} />
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="none">등록된 내용이 없습니다.</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </section>
