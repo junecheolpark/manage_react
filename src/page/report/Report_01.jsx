@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
+import { api } from "api/api";
 import { LeftEventContext } from "component/layout/HeadLeftLayout";
+import { useLoading } from "context/LoadingContext";
 import { fnLayerPopupView, fnSelYear } from 'common/js/function';
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
@@ -9,6 +11,10 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import style from './css/report_01.module.css'
 
 const Report_01 = () => {
+    // ================================================================
+    // SECTION 1. 초기 설정 (주차 관련)
+    // ================================================================
+   
     // left 버튼 등록 이벤트
     const { setOnRegister } = useContext(LeftEventContext);
 
@@ -21,8 +27,8 @@ const Report_01 = () => {
         alert("Report01 등록 로직 실행!");
         fnLayerPopupView('WeekLayerPopUp', true);
     };
-    //*********************************************************** */
-
+    
+    //셀렉트 박스 셋팅
     const today = new Date();
     const currentYear = today.getFullYear();
     const defaultMonth = String(today.getMonth() + 1).padStart(2, "0"); // '01'~'12'
@@ -151,10 +157,46 @@ const Report_01 = () => {
         }
     }, []);
 
-    //*********************************************************** */
+    // ================================================================
+    // SECTION 2. 검색 / 페이징 / 목록 조회
+    // ================================================================
+    const [curPage, setCurPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [totalCnt, setTotalCnt] = useState(0);
 
+    const [workList, setWorkList] = useState([]);
     const [beforeWeek, setBeforeWeek] = useState("");
     const [nextWeek, setNextWeek] = useState("");
+
+    
+
+    const fnWorkWeekList = async () => {
+        const paramMap = {
+            preyyyy: parseInt(weekDate[0]),
+            prewwork: parseInt(weekDate[3]),
+            yyyy: parseInt($('#selYear').val()),
+            wwork: parseInt($('#selWeek').val()),
+            uidx: 0
+        }
+        try {
+            setIsLoading(true);
+
+            const res = await api.post(api.get("/weekWork/list", params));
+
+            setWorkList(res.data || []);
+        } catch (err) {
+            console.error(err);
+            alert("목록 불러오기 실패");
+            setIsLoading(false);
+        } finally {
+            setIsLoading(false);
+        }
+
+    };
+
+    useEffect(() => {
+        fnWorkWeekList();
+    }, []);
     return (
         <section className="contens">
             {/* 팝업 */}
