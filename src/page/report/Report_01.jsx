@@ -3,7 +3,7 @@ import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
 import { LeftEventContext } from "component/layout/HeadLeftLayout";
-import { fnLayerPopupView, fnSelYear, isEmpty } from 'common/js/function';
+import { fnLayerPopupView, fnSelYear, isEmpty, fnDeleteMsg } from 'common/js/function';
 
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -175,7 +175,7 @@ const Report_01 = () => {
         } else {
             preWeek = weekArr[wIdx - 1].week;
         }
-        
+
         const params = {
             preyyyy: Number(preYear),
             prewwork: Number(preWeek),
@@ -192,15 +192,15 @@ const Report_01 = () => {
             ]);
 
             setWorkList(res.data || []);
-            const resInputData = resInput.data;
-            
-            if (resInputData.length > 0) {
-                setWorkInputList(resInput.data || []);
-                setBeforeWeek(resInputData[0].prev_CONTS || "");
-                setNextWeek(resInputData[0].now_CONTS || "");
-                console.log(isEmpty(resInput.data));
-                setRegisterLabel("수정");
-            }
+            const input = resInput.data;
+
+            const hasData = input.length > 0;
+            setWorkInputList(hasData ? input[0] : []);
+            setBeforeWeek(hasData ? input[0].prev_CONTS ?? "" : "");
+            setNextWeek(hasData ? input[0].now_CONTS ?? "" : "");
+
+            // UI 로직 left 버튼
+            setRegisterLabel(hasData && !isEmpty(input[0].now_CONTS) ? "수정" : "등록");
         } catch (err) {
             console.error(err);
             alert("목록 불러오기 실패");
@@ -216,7 +216,97 @@ const Report_01 = () => {
     }, [week]);
 
     // ================================================================
-    // SECTION 6. Left 버튼 연동
+    // SECTION 3. 등록 / 수정 / 삭제
+    // ================================================================
+
+    // 등록/수정
+    const fnWorkWeekInput = async () => {
+        if (isEmpty(beforeWeek) && isEmpty(nextWeek)) {
+            alert("내용을 입력해주세요.");
+            return;
+        }
+
+        const dateRange = weekArr.find(w => w.week === week);
+        if (!dateRange) return alert("유효하지 않은 주차입니다.");
+
+        const [sdate, edate] = [dateRange.start.join("-"), dateRange.end.join("-")];
+        const timestamp = new Date().toISOString().replace("T", " ").split(".")[0];
+
+        try {
+            setIsLoading(true);
+            const params = {
+                widx: workInputList?.week_WORK_CONTS_IDX ?? 0,
+                yyyy: year,
+                wwork: week,
+                uidx: adminUser._c_logIdx,
+                sdate,
+                edate,
+                cidx: 12,
+                pconts: beforeWeek,
+                nconts: nextWeek,
+                rcd: timestamp
+            };
+            const res = await api.post("/weekWork/input", params);
+            const result = res.data;
+
+            if (result === 0) {
+                alert("처리되었습니다.");
+                // await deleteTmpWorkWeek(9, timestamp);
+                await fnWorkWeekList(); // 목록 재조회
+                fnLayerPopupView('WeekLayerPopUp', false)
+            } else {
+                alert("처리 실패");
+            }
+
+        } catch (e) {
+            console.error(e);
+            alert("등록 실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const deleteWorkWeek = async (delType, rcd) => {
+        if (!fnDeleteMsg(delType)) return;
+
+        const dtp = delType === 9 ? 2 : 1;
+
+        try {
+            setIsLoading(true);
+
+            const params = {
+                deltp: dtp,
+                yyyy: year,
+                wwork: week,
+                uidx: adminUser._c_logIdx,
+                didx: adminUser._c_logIdx,
+                rcd,
+            };
+
+            const res = await api.post("/weekWork/delete", params);
+            const result = res.data;
+
+            if (result === 0) {
+                if (delType !== 9) {
+                    alert("처리되었습니다.");
+                    await fnWorkWeekList();
+                    fnLayerPopupView('WeekLayerPopUp', false)
+                }
+            } else {
+                alert("삭제 실패");
+            }
+
+        } catch (e) {
+            console.error(e);
+            alert("삭제 실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    // ================================================================
+    // SECTION 4. Left 버튼 연동
     // ================================================================
     const { setOnRegister, setRegisterLabel } = useContext(LeftEventContext);
 
@@ -324,11 +414,10 @@ const Report_01 = () => {
                             </div>
 
                             <div className="autoSizeLayerF">
-                                <a id="btnSave" className="btn btnBlue" href="#">
-                                    {isEmpty(workInputList) ? "등록" : "수정"}
+                                <a id="btnSave" className="btn btnBlue" href="#" onClick={() => fnWorkWeekInput()}>
+                                    {!isEmpty(workInputList?.now_CONTS) ? "수정" : "등록"}
                                 </a>
-                                <a id="btnDelete" className="btn btnRed" href="#" style={{ display: "none" }}
-                                >
+                                <a id="btnDelete" className="btn btnRed" href="#" style={{ display: !isEmpty(workInputList?.now_CONTS) ? "blcok" : "none" }}>
                                     삭제
                                 </a>
                                 <a href="#popclose" className="btn btnWhite btn-layerClose" onClick={() => fnLayerPopupView('WeekLayerPopUp', false)}>

@@ -8,7 +8,6 @@ function Lefter() {
 
     const handleClick = (e) => {
         e.preventDefault();
-        console.log(onRegister);
         if (onRegister) onRegister(); // 현재 페이지가 지정한 함수 실행
         else alert("등록 기능이 없는 페이지입니다.");
     };
