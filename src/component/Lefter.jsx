@@ -4,10 +4,11 @@ import { LeftEventContext } from "component/layout/HeadLeftLayout";
 
 function Lefter() {
     // "/report/01", "/schedule/01", "/system/02" 버튼 클릭시 이벤트 실행
-    const { onRegister } = useContext(LeftEventContext);
+    const { onRegister, registerLabel } = useContext(LeftEventContext);
 
     const handleClick = (e) => {
         e.preventDefault();
+        console.log(onRegister);
         if (onRegister) onRegister(); // 현재 페이지가 지정한 함수 실행
         else alert("등록 기능이 없는 페이지입니다.");
     };
@@ -59,7 +60,7 @@ function Lefter() {
                         <div id="leftTopRpt01" className="leftTopConts" onClick={handleClick}>
                             <div className="ucTable">
                                 <a href="#reg" className="btn btn100 btnBlue">
-                                    등록
+                                    {registerLabel}
                                 </a>
                             </div>
                         </div>

@@ -159,9 +159,7 @@ const Report_01 = () => {
     const [workInputList, setWorkInputList] = useState([]);
     const [beforeWeek, setBeforeWeek] = useState("");
     const [nextWeek, setNextWeek] = useState("");
-
     
-
     const fnWorkWeekList = async () => {
         const wIdx = weekArr.findIndex(item => item.week === week);
         let preWeek = 0;
@@ -194,12 +192,14 @@ const Report_01 = () => {
             ]);
 
             setWorkList(res.data || []);
-            // setWorkInputList(resInput.data || []);
             const resInputData = resInput.data;
-
+            
             if (resInputData.length > 0) {
+                setWorkInputList(resInput.data || []);
                 setBeforeWeek(resInputData[0].prev_CONTS || "");
                 setNextWeek(resInputData[0].now_CONTS || "");
+                console.log(isEmpty(resInput.data));
+                setRegisterLabel("수정");
             }
         } catch (err) {
             console.error(err);
@@ -218,7 +218,7 @@ const Report_01 = () => {
     // ================================================================
     // SECTION 6. Left 버튼 연동
     // ================================================================
-    const { setOnRegister } = useContext(LeftEventContext);
+    const { setOnRegister, setRegisterLabel } = useContext(LeftEventContext);
 
     const handleRegister = () => {
         fnLayerPopupView('WeekLayerPopUp', true);
@@ -325,7 +325,7 @@ const Report_01 = () => {
 
                             <div className="autoSizeLayerF">
                                 <a id="btnSave" className="btn btnBlue" href="#">
-                                    등록
+                                    {isEmpty(workInputList) ? "등록" : "수정"}
                                 </a>
                                 <a id="btnDelete" className="btn btnRed" href="#" style={{ display: "none" }}
                                 >

@@ -7,8 +7,10 @@ export const LeftEventContext = createContext();
 
 function HeadLeftLayout() {
     const [onRegister, setOnRegister] = useState(null);
+    const [registerLabel, setRegisterLabel] = useState("등록"); // ← 텍스트 추가
+
     return (
-        <LeftEventContext.Provider value={{ onRegister, setOnRegister }}>
+        <LeftEventContext.Provider value={{ onRegister, setOnRegister, registerLabel, setRegisterLabel }}>
             <Header />
             <section className="contentsBox">
                 <Lefter />
