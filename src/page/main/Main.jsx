@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import style from './css/main.module.css'
 
 function Main() {
+
+    // ================================================================
+    // SECTION 1. 초기 설정
+    // ================================================================
     useEffect(() => {
         document.addEventListener("click", (e) => {
             const el = e.target.closest("a");
@@ -36,7 +40,7 @@ function Main() {
         // 실제 저장 로직(API 호출 등)은 여기서 처리
     };
 
-/* 메모 관련 **/
+    /* 메모 관련 **/
 
     return (
         <section className={style.board}>

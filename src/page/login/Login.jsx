@@ -8,12 +8,20 @@ import { fnAlertReturn } from 'common/js/function';
 import style from './css/login.module.css'
 const Login = () => {
 
+    // ================================================================
+    // SECTION 1. 초기 설정
+    // ================================================================
+
     // Redux의 dispatch 함수 가져오기
     // → 액션(userLogin, userLogout 등)을 실행할 때 사용
     const dispatch = useDispatch();
-    const [loginInfo, setLoginInfo] = useState({ adminId: 'qwc22', adminPwd: '1234' });
-
     const { setIsLoading } = useLoading();
+
+    // ================================================================
+    // SECTION 2. 로그인 처리
+    // ================================================================
+
+    const [loginInfo, setLoginInfo] = useState({ adminId: 'qwc22', adminPwd: '1234' });
 
     const getAdminId = (e) => {
         setLoginInfo((prev) => {

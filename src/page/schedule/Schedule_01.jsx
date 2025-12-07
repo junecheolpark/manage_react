@@ -11,23 +11,16 @@ import './css/schduleFullcalender.css'
 import style from './css/schedule_01.module.css'
 
 const Schedule_01 = () => {
-    // left 버튼 등록 이벤트
-    const { setOnRegister } = useContext(LeftEventContext);
 
-    useEffect(() => {
-        setOnRegister(() => handleRegister);
-        return () => setOnRegister(null);
-    }, [setOnRegister]);
+    // ================================================================
+    // SECTION 1. 초기 설정
+    // ================================================================
 
-    const handleRegister = () => {
-        fnLayerPopupView("scheduleInputView", true);
-    };
-
-    const handleUserSelectPopup = () => {
+    const fnUserSelectPopup = () => {
         fnLayerPopupView("CheckList", true);
     };
 
-    const handleSave = () => {
+    const fnSave = () => {
         alert("일정 저장 로직 실행!");
     };
     //*********************************************************** */
@@ -36,7 +29,7 @@ const Schedule_01 = () => {
         { title: "출장", start: "2025-11-07", end: "2025-11-09", extendedProps: { stype: 2, sidx: 102 } },
     ]);
 
-    const handleEventClick = (info) => {
+    const fnEventClick = (info) => {
         const { title, extendedProps } = info.event;
         const sidx = extendedProps?.sidx;
 
@@ -71,7 +64,7 @@ const Schedule_01 = () => {
     const calendarRef = useRef(null); // FullCalendar 제어용 ref
 
     // 버튼 클릭 핸들러
-    const handleCalendarNav = (type) => {
+    const fnCalendarNav = (type) => {
         const calendarApi = calendarRef.current.getApi(); // FullCalendar 인스턴스 접근
         const today = new Date();
 
@@ -115,12 +108,26 @@ const Schedule_01 = () => {
     // 예: 2025년부터 올해까지 역순 리스트 만들기
     const years = fnSelYear(2025, (currentYear - 2025 + 1), false, '년');
 
+    // ================================================================
+    // SECTION 6. Left 버튼 연동
+    // ================================================================
+    const { setOnRegister } = useContext(LeftEventContext);
+
+    const handleRegister = () => {
+        fnLayerPopupView("scheduleInputView", true);
+    };
+
+    useEffect(() => {
+        setOnRegister(() => handleRegister);
+        return () => setOnRegister(null);
+    }, [setOnRegister]);
+
     return (
         <section className="contens">
             {/* 상단 검색 및 이동 */}
             <section className={`${style.schBoxs} schBox txtC`}>
                 <section>
-                    <a className={style.btnPrev} id="btnPrev" href="#" onClick={() => handleCalendarNav("prev")}>
+                    <a className={style.btnPrev} id="btnPrev" href="#" onClick={() => fnCalendarNav("prev")}>
                         <img src="/images/btn/btn_bleft.png" alt="이전" />
                     </a>
                     &nbsp;
@@ -153,10 +160,10 @@ const Schedule_01 = () => {
                         })}
                     </select>
                     &nbsp;
-                    <a className={style.btnNext} id="btnNext" href="#" onClick={() => handleCalendarNav("next")}>
+                    <a className={style.btnNext} id="btnNext" href="#" onClick={() => fnCalendarNav("next")}>
                         <img src="/images/btn/btn_nright.png" alt="다음" />
                     </a>
-                    <input type="button" id="btnToday" value="오늘" className="btn btnBlue" onClick={() => handleCalendarNav("today")} />
+                    <input type="button" id="btnToday" value="오늘" className="btn btnBlue" onClick={() => fnCalendarNav("today")} />
                 </section>
             </section>
 
@@ -174,7 +181,7 @@ const Schedule_01 = () => {
                         displayEventTime={false} // 이벤트 시간 표시 여부
                         editable={false} // 이벤트 수정 가능 여부
                         selectable={false} // 날짜 선택 가능 여부
-                        eventClick={handleEventClick} // 이벤트 클릭 시 실행할 함수
+                        eventClick={fnEventClick} // 이벤트 클릭 시 실행할 함수
                         eventContent={renderEventContent} // 각 이벤트 표시 커스터마이징
                         events={events} // 이벤트 데이터
                         headerToolbar={false} // 상단 헤더 툴바 제거
@@ -247,7 +254,7 @@ const Schedule_01 = () => {
                                                             <a href="#" 
                                                                 id="btnUser"
                                                                 className={`${style.btnUser} btn btnBlue`}
-                                                                onClick={handleUserSelectPopup}
+                                                                onClick={fnUserSelectPopup}
                                                             >
                                                                 선택
                                                             </a>
@@ -333,7 +340,7 @@ const Schedule_01 = () => {
                                     <a href="#" 
                                         id="btnSave"
                                         className="btn btnBlue"
-                                        onClick={handleSave}
+                                        onClick={fnSave}
                                     >
                                         저장
                                     </a>

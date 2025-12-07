@@ -10,6 +10,10 @@ import CategoryPanel from "./component/CategoryPanel";
 import style from './css/system_01.module.css'
 
 const System_01 = () => {
+
+    // ================================================================
+    // SECTION 1. 상태 정의
+    // ================================================================
     const adminUser = useSelector(state => state.authUser);
     const { setIsLoading } = useLoading();
     // =============================
@@ -40,9 +44,9 @@ const System_01 = () => {
 
 
 
-    // =============================
-    // 2) API 호출 함수
-    // =============================
+    // ================================================================
+    // SECTION 2. 상태 정의
+    // ================================================================
 
     const loadCategory = async (level, parentIdx) => {
         try {
@@ -64,10 +68,13 @@ const System_01 = () => {
         }
     };
 
+    useEffect(() => {
+        loadCategory(1, 0);
+    }, []);
 
-    // 3) 항목 클릭 시 하위 목록 로딩
+    // 2-1) 항목 클릭 시 하위 목록 로딩
 
-    const handleSelectCate1 = (item) => {
+    const fnSelectCate1 = (item) => {
 
         setCate1Form({
             cidx: item.code_IDX,
@@ -83,7 +90,7 @@ const System_01 = () => {
         loadCategory(2, item.code_IDX);
     };
 
-    const handleSelectCate2 = (item) => {
+    const fnSelectCate2 = (item) => {
 
         setCate2Form({
             cidx: item.code_IDX,
@@ -99,7 +106,7 @@ const System_01 = () => {
         loadCategory(3, item.code_IDX);
     };
 
-    const handleSelectCate3 = (item) => {
+    const fnSelectCate3 = (item) => {
         setCate3Form({
             cidx: item.code_IDX,
             pidx: item.parent_IDX,
@@ -113,9 +120,7 @@ const System_01 = () => {
     };
 
 
-    // =============================
-    // 4) 입력 변경
-    // =============================
+    // 2-2) 입력 변경
 
     const onChange1 = (key, value) =>
         setCate1Form((prev) => ({ ...prev, [key]: value }));
@@ -127,9 +132,9 @@ const System_01 = () => {
         setCate3Form((prev) => ({ ...prev, [key]: value }));
 
 
-    // =============================
-    // 5) 저장 / 취소
-    // =============================
+    // ================================================================
+    // SECTION 3. 등록 / 수정 / 취소 
+    // ================================================================
 
     /**
      * 코드 저장
@@ -229,9 +234,6 @@ const System_01 = () => {
     // 6) UI 렌더링
     // =============================
 
-    useEffect(() => {
-        loadCategory(1, 0);
-    }, []);
 
     return (
         <section className="contens">
@@ -242,7 +244,7 @@ const System_01 = () => {
                     level={1}
                     list={cate1List}
                     form={cate1Form}
-                    onSelect={handleSelectCate1}
+                    onSelect={fnSelectCate1}
                     onFormChange={onChange1}
                     onSave={() => saveCate(1)}
                     onCancel={() => cancel(1)}
@@ -255,7 +257,7 @@ const System_01 = () => {
                     level={2}
                     list={cate2List}
                     form={cate2Form}
-                    onSelect={handleSelectCate2}
+                    onSelect={fnSelectCate2}
                     onFormChange={onChange2}
                     onSave={() => saveCate(2)}
                     onCancel={() => cancel(2)}
@@ -268,7 +270,7 @@ const System_01 = () => {
                     level={3}
                     list={cate3List}
                     form={cate3Form}
-                    onSelect={handleSelectCate3}
+                    onSelect={fnSelectCate3}
                     onFormChange={onChange3}
                     onSave={() => saveCate(3)}
                     onCancel={() => cancel(3)}

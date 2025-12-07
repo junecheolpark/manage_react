@@ -8,12 +8,11 @@ import { fnLayerPopupView, fnSelYear, isEmpty, fnDeleteMsg } from 'common/js/fun
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
-// import './css/report_01.css'
 import style from './css/report_01.module.css'
 
 const Report_01 = () => {
     // ================================================================
-    // SECTION 1. 초기 설정 (주차 관련)
+    // SECTION 1. 초기 설정 및 주차 로직 설정
     // ================================================================
     const adminUser = useSelector(state => state.authUser);
     const { setIsLoading } = useLoading();
