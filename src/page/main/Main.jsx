@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { api } from "api/api";
+import { useSelector } from "react-redux";
+import { useLoading } from "context/LoadingContext";
 // import  './css/main.css'
 import style from './css/main.module.css'
 
@@ -7,12 +10,39 @@ function Main() {
     // ================================================================
     // SECTION 1. 초기 설정
     // ================================================================
-    useEffect(() => {
-        document.addEventListener("click", (e) => {
-            const el = e.target.closest("a");
-            if (el && el.getAttribute("href") === "#") e.preventDefault();
-        });
-    }, []);
+
+    const adminUser = useSelector(state => state.authUser);
+    const { setIsLoading } = useLoading();
+
+    // useEffect(() => {
+    //     document.addEventListener("click", (e) => {
+    //         const el = e.target.closest("a");
+    //         if (el && el.getAttribute("href") === "#") e.preventDefault();
+    //     });
+    // }, []);
+
+    // 출퇴근 등록
+    const fnWorkInoutInput = async () => {
+        const params = {
+            uidx: adminUser._c_logIdx,
+            iotp: 0
+        }
+        try {
+            setIsLoading(true);
+            const res = await api.post("/schedule/workInoutInput", params);
+            const result = res.data;
+            console.log(res)
+            if (result === 0) {
+                alert("처리 되었습니다.");
+            } else {
+                alert("출/퇴근 등록 실패");
+            }
+        } catch (err) {
+            alert("실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     /* 메모 관련 */
     const [memos, setMemos] = useState([]);
@@ -63,7 +93,7 @@ function Main() {
                         <p className="mgTB10">남은연차 <span id="yearLeave" className="floatR colGray2">0</span></p>
                         <div className={style.txtC}>
                             <p className={style.fick}>
-                                <a href="#reg" className="btn btn100 btnBlue" onClick={() => { }}>출/퇴근 등록</a>
+                                <a href="#reg" className="btn btn100 btnBlue" onClick={() => fnWorkInoutInput()}>출/퇴근 등록</a>
                             </p>
                         </div>
                     </div>

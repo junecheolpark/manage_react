@@ -9,8 +9,6 @@ import Report_01 from 'page/report/Report_01';
 import Schedule_01 from 'page/schedule/Schedule_01';
 import User_01 from 'page/user/User_01';
 import Board_01 from 'page/board/Board_01';
-import Board_02 from 'page/board/Board_02';
-import Board_03 from 'page/board/Board_03';
 import System_01 from 'page/system/System_01';
 import System_02 from 'page/system/System_02';
 
