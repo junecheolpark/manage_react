@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
@@ -13,6 +14,7 @@ function Main() {
 
     const adminUser = useSelector(state => state.authUser);
     const { setIsLoading } = useLoading();
+    const navigate = useNavigate()
 
     // useEffect(() => {
     //     document.addEventListener("click", (e) => {
@@ -43,6 +45,50 @@ function Main() {
             setIsLoading(false);
         }
     };
+
+    const [boardList, setBoardList] = useState([]);
+    const [activeMbidx, setActiveMbidx] = useState(0);
+
+    const fnBoardList = async (midx) => {
+        const params = {
+            ltype: 2,
+            page: 1,
+            psize: 5,
+            midx: Number(midx),
+            schd1: "",
+            schd2: "",
+            schrncm: "",
+            schsel: 0,
+            schtxt: "",
+            orderby: 0,
+            desc: 0
+        };
+        try {
+            setIsLoading(true);
+            const res = await api.get("/board/list", {params});
+            const result = res.data;
+            console.log(result)
+            
+            setBoardList(Array.isArray(result) ? result : []);
+        } catch {
+            alert("실패");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const fnBoardDetail = (mbidx, bidx) => {
+        switch (mbidx) {
+            case 10: navigate(`/clipboard/01?bidx=${bidx}`); break;
+            case 11: navigate(`/clipboard/02?bidx=${bidx}`); break;
+            case 12: navigate(`/clipboard/03?bidx=${bidx}`); break;
+            default: break;
+        }
+    };
+
+    useEffect(() => {
+        fnBoardList(activeMbidx);
+    }, [activeMbidx]);
 
     /* 메모 관련 */
     const [memos, setMemos] = useState([]);
@@ -158,10 +204,37 @@ function Main() {
                         </div>
                         <div className={style.tabMenuList}>
                             <ul>
-                                <li data-mbidx="0" className={style.choicebulletin}><a href="#all">전체</a></li>
-                                <li data-mbidx="10"><a href="/WEB-INF/views/clipboard/clipboard_01.html">공지사항</a></li>
-                                <li data-mbidx="11"><a href="/WEB-INF/views/clipboard/clipboard_02.html">자료실</a></li>
-                                <li data-mbidx="12"><a href="/WEB-INF/views/clipboard/clipboard_03.html">업무공유</a></li>
+                                <li
+                                    data-mbidx="0"
+                                    className={activeMbidx === 0 ? style.choicebulletin : ""}
+                                    onClick={() => setActiveMbidx(0)}
+                                >
+                                    <a href="#all">전체</a>
+                                </li>
+
+                                <li
+                                    data-mbidx="10"
+                                    className={activeMbidx === 10 ? style.choicebulletin : ""}
+                                    onClick={() => setActiveMbidx(10)}
+                                >
+                                    <a href="#">공지사항</a>
+                                </li>
+
+                                <li
+                                    data-mbidx="11"
+                                    className={activeMbidx === 11 ? style.choicebulletin : ""}
+                                    onClick={() => setActiveMbidx(11)}
+                                >
+                                    <a href="#">자료실</a>
+                                </li>
+
+                                <li
+                                    data-mbidx="12"
+                                    className={activeMbidx === 12 ? style.choicebulletin : ""}
+                                    onClick={() => setActiveMbidx(12)}
+                                >
+                                    <a href="#">업무공유</a>
+                                </li>
                             </ul>
                         </div>
                         <div className={style.tabMenuCont}>
@@ -169,9 +242,24 @@ function Main() {
                                 <li>
                                     <a href="#">전체</a>
                                     <ul id="boardList">
-                                        <li style={{ textAlign: "center" }}>
-                                            <span className="noData">검색된 게시글이 없습니다.</span>
-                                        </li>
+                                        {boardList.length > 0 ? (
+                                            boardList.map((val, i) => (
+                                                <li key={val.board_IDX} onClick={() => fnBoardDetail(val.master_BOARD_IDX, val.board_IDX)}>
+                                                    <a>
+                                                        {val.dateCnt < 7 && <img src="/resources/images/icon/newIcon.png" alt="new" />}
+                                                        {val.subj}
+                                                    </a>
+                                                    <p>
+                                                        <span className="colGray2">{val.reg_NM}</span>&nbsp;
+                                                        <span className="colGray2">{val.reg_DATE.substring(0, 10)}</span>
+                                                    </p>
+                                                </li>
+                                            ))
+                                        ) : (
+                                            <li style={{ textAlign: "center" }}>
+                                                <span className="noData">검색된 게시글이 없습니다.</span>
+                                            </li>
+                                        )}
                                     </ul>
                                 </li>
                             </ul>
