@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { api } from "api/api";
 import { useSelector } from "react-redux";
 import { useLoading } from "context/LoadingContext";
-// import  './css/main.css'
 import style from './css/main.module.css'
 
 function Main() {
@@ -16,12 +15,6 @@ function Main() {
     const { setIsLoading } = useLoading();
     const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     document.addEventListener("click", (e) => {
-    //         const el = e.target.closest("a");
-    //         if (el && el.getAttribute("href") === "#") e.preventDefault();
-    //     });
-    // }, []);
 
     // 출퇴근 등록
     const fnWorkInoutInput = async () => {
@@ -67,7 +60,6 @@ function Main() {
             setIsLoading(true);
             const res = await api.get("/board/list", {params});
             const result = res.data;
-            console.log(result)
             
             setBoardList(Array.isArray(result) ? result : []);
         } catch {
@@ -102,15 +94,15 @@ function Main() {
         setMemos([...memos, { id: Date.now(), text: "" }]);
     };
 
-    const handleDelete = (id) => {
+    const fnMemoDelete = (id) => {
         setMemos(memos.filter((m) => m.id !== id));
     };
 
-    const handleChange = (id, value) => {
+    const fnMemoChange = (id, value) => {
         setMemos(memos.map((m) => (m.id === id ? { ...m, text: value } : m)));
     };
 
-    const handleSave = (id) => {
+    const fnMemoSave = (id) => {
         const memo = memos.find((m) => m.id === id);
         alert(`저장된 메모 내용:\n${memo.text}`);
         // 실제 저장 로직(API 호출 등)은 여기서 처리
@@ -282,14 +274,14 @@ function Main() {
                                 <div className="floatR" data-uidx="0" data-rdate="">
                                     <button
                                         className="btn btnS btnWhite memoSave"
-                                        onClick={() => handleSave(memo.id)}
+                                        onClick={() => fnMemoSave(memo.id)}
                                     >
                                         저장
                                     </button>
                                     &nbsp;
                                     <button
                                         className="btn btnS btnBlueLine memoDel"
-                                        onClick={() => handleDelete(memo.id)}
+                                        onClick={() => fnMemoDelete(memo.id)}
                                     >
                                         삭제
                                     </button>
@@ -299,7 +291,7 @@ function Main() {
                                     cols="5"
                                     className="txtMemo"
                                     value={memo.text}
-                                    onChange={(e) => handleChange(memo.id, e.target.value)}
+                                    onChange={(e) => fnMemoChange(memo.id, e.target.value)}
                                 />
                             </div>
                         </div>
